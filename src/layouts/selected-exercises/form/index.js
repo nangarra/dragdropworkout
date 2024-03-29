@@ -12,26 +12,27 @@ import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import Loading from "components/MDLoader";
 import Notification from "components/Notification";
-import { useMaterialUIController } from "context";
-import { setToast } from "context";
+import { setToast, useMaterialUIController } from "context";
 import { navbarIconButton } from "examples/Navbars/DashboardNavbar/styles";
 import { useEffect, useState } from "react";
-import { saveWorkout } from "services/workouts";
+import { useParams } from "react-router-dom";
+import { saveExercise } from "services/exercises";
 
 const style = { width: 600 };
 
 const DEFAULT_VALUES = { title: null, description: null, thumbnail: null };
 
-const WorkoutForm = (props) => {
-  const { open, onClose, workout = {} } = props;
+const ExerciseForm = (props) => {
+  const { open, onClose, exercise = {} } = props;
   const [, dispatch] = useMaterialUIController();
   const [errors, setError] = useState({ title: null });
   const [hover, setHover] = useState(false);
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState({});
+  const { workoutId } = useParams();
 
   useEffect(() => {
-    setValues(workout.id ? workout : DEFAULT_VALUES);
+    setValues(exercise.id ? exercise : DEFAULT_VALUES);
   }, [open]);
 
   const handleChange = (e) => {
@@ -60,10 +61,11 @@ const WorkoutForm = (props) => {
     }
     setLoading(true);
     try {
-      const response = await saveWorkout(values);
+      values.workoutId = workoutId;
+      const response = await saveExercise(values);
       setToast(
         dispatch,
-        <Notification type="success" title="Success!" content="Workout created successfully!" />
+        <Notification type="success" title="Success!" content="Exercise created successfully!" />
       );
       handleClose();
     } catch (error) {
@@ -96,7 +98,7 @@ const WorkoutForm = (props) => {
 
   const Header = () => (
     <Typography variant="h4" className="flex justify-between p-4 border-b">
-      {workout?.id ? "Edit" : "Add"} New Workout
+      {exercise?.id ? "Edit" : "Add"} New Exercise
       <IconButton size="small" color="inherit" sx={navbarIconButton} onClick={onClose}>
         <Icon>clear</Icon>
       </IconButton>
@@ -174,4 +176,4 @@ const WorkoutForm = (props) => {
   );
 };
 
-export default WorkoutForm;
+export default ExerciseForm;

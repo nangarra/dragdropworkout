@@ -16,14 +16,14 @@ import { useMaterialUIController } from "context";
 import { setToast } from "context";
 import { navbarIconButton } from "examples/Navbars/DashboardNavbar/styles";
 import { useEffect, useState } from "react";
-import { saveWorkout } from "services/workouts";
+import { saveNutrition } from "services/nutritions";
 
 const style = { width: 600 };
 
 const DEFAULT_VALUES = { title: null, description: null, thumbnail: null };
 
-const WorkoutForm = (props) => {
-  const { open, onClose, workout = {} } = props;
+const NutritionForm = (props) => {
+  const { open, onClose, nutrition = {} } = props;
   const [, dispatch] = useMaterialUIController();
   const [errors, setError] = useState({ title: null });
   const [hover, setHover] = useState(false);
@@ -31,7 +31,7 @@ const WorkoutForm = (props) => {
   const [values, setValues] = useState({});
 
   useEffect(() => {
-    setValues(workout.id ? workout : DEFAULT_VALUES);
+    setValues(nutrition.id ? nutrition : DEFAULT_VALUES);
   }, [open]);
 
   const handleChange = (e) => {
@@ -60,10 +60,10 @@ const WorkoutForm = (props) => {
     }
     setLoading(true);
     try {
-      const response = await saveWorkout(values);
+      const response = await saveNutrition(values);
       setToast(
         dispatch,
-        <Notification type="success" title="Success!" content="Workout created successfully!" />
+        <Notification type="success" title="Success!" content="Nutrition created successfully!" />
       );
       handleClose();
     } catch (error) {
@@ -96,7 +96,7 @@ const WorkoutForm = (props) => {
 
   const Header = () => (
     <Typography variant="h4" className="flex justify-between p-4 border-b">
-      {workout?.id ? "Edit" : "Add"} New Workout
+      {nutrition?.id ? "Edit" : "Add"} New Nutrition
       <IconButton size="small" color="inherit" sx={navbarIconButton} onClick={onClose}>
         <Icon>clear</Icon>
       </IconButton>
@@ -174,4 +174,4 @@ const WorkoutForm = (props) => {
   );
 };
 
-export default WorkoutForm;
+export default NutritionForm;

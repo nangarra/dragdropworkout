@@ -189,7 +189,7 @@ const AllRoutes = () => {
           <Sidenav
             color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-            brandName="Workout Planner"
+            brandName="DragDropWorkout"
             routes={routes.protectedRoutes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}

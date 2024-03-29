@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteWorkout, getWorkouts } from "services/workouts";
+import { getNutritions, deleteNutrition } from "services/nutritions";
 
 const Loader = () => (
   <>
@@ -26,14 +26,14 @@ const Loader = () => (
   </>
 );
 
-const NoWorkouts = ({ onOpen }) => (
+const NoNutritions = ({ onOpen }) => (
   <Grid item xs={12} md={6} lg={3}>
     <Paper
       variant="outlined"
       className="rounded-xl w-full h-[280px] p-4 flex flex-col items-center justify-center gap-4"
     >
       <div className="flex flex-col items-center justify-center gap-4 border border-gray-300 rounded-lg p-8">
-        <Typography>Add Workouts Now!</Typography>
+        <Typography>Add Nutritions Now!</Typography>
         <MDButton size="small" variant="gradient" color="primary" onClick={onOpen}>
           <Icon>add</Icon>&nbsp;Add New
         </MDButton>
@@ -42,86 +42,88 @@ const NoWorkouts = ({ onOpen }) => (
   </Grid>
 );
 
-const WorkoutList = (props) => {
+const NutritionList = (props) => {
   const { onOpen, getData } = props;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [workouts, setWorkouts] = useState([]);
-  const [noWorkouts, setNoWorkouts] = useState(false);
+  const [nutritions, setNutritions] = useState([]);
+  const [noNutritions, setNoNutritions] = useState(false);
   const [hover, setHover] = useState(null);
   const [confirm, setConfirm] = useState(false);
-  const [deleteWorkoutId, setDeleteWorkoutId] = useState(null);
+  const [deleteNutritionId, setDeleteNutritionId] = useState(null);
 
   useEffect(() => {
-    getWorkoutsData();
+    getNutritionsData();
   }, []);
 
   useEffect(() => {
     if (getData) {
-      getWorkoutsData();
+      getNutritionsData();
     }
   }, [getData]);
 
-  const getWorkoutsData = async () => {
+  const getNutritionsData = async () => {
     setLoading(true);
-    const response = await getWorkouts();
-    setNoWorkouts(_.isEmpty(response.data));
-    setWorkouts(response.data);
+    const response = await getNutritions();
+    setNoNutritions(_.isEmpty(response.data));
+    setNutritions(response.data);
     setLoading(false);
   };
 
-  const gotoExercises = (id) => {
-    navigate(`/exercises/${id}`);
+  const gotoNutritions = (id) => {
+    navigate(`/nutritions/${id}`);
   };
 
-  const editWorkout = (workout) => {
-    onOpen(workout);
+  const editNutrition = (nutrition) => {
+    onOpen(nutrition);
   };
 
-  const confirmDeleteWorkout = (id) => {
+  const confirmDeleteNutrition = (id) => {
     setConfirm(true);
-    setDeleteWorkoutId(id);
+    setDeleteNutritionId(id);
   };
 
-  const closeConfirmDeleteWorkout = () => {
+  const closeConfirmDeleteNutrition = () => {
     setConfirm(false);
-    setDeleteWorkoutId(null);
+    setDeleteNutritionId(null);
   };
 
-  const deleteWorkoutConfirmed = async () => {
-    const response = await deleteWorkout(deleteWorkoutId);
+  const deleteNutritionConfirmed = async () => {
+    const response = await deleteNutrition(deleteNutritionId);
 
-    closeConfirmDeleteWorkout();
-    getWorkoutsData();
+    closeConfirmDeleteNutrition();
+    getNutritionsData();
   };
 
   return (
     <MDBox py={3}>
       <Confirmation
         open={confirm}
-        title="Delete Workout"
-        message="Are you sure you want to delete this workout?"
-        onClose={closeConfirmDeleteWorkout}
-        onConfirm={deleteWorkoutConfirmed}
+        title="Delete Nutrition"
+        message="Are you sure you want to delete this nutrition?"
+        onClose={closeConfirmDeleteNutrition}
+        onConfirm={deleteNutritionConfirmed}
       />
       <Grid container spacing={3}>
         <Loading loading={loading} customLoader={<Loader />}>
-          {noWorkouts && <NoWorkouts onOpen={onOpen} />}
-          {workouts.map((row) => (
+          {noNutritions && <NoNutritions onOpen={onOpen} />}
+          {nutritions.map((row) => (
             <Grid
-              key={row.id}
               item
               xs={12}
-              md={6}
+              sm={6}
+              md={4}
               lg={3}
-              onMouseEnter={() => setHover(row.id)}
+              xl={2}
+              key={row.id}
               onMouseLeave={() => setHover(null)}
+              onMouseEnter={() => setHover(row.id)}
             >
-              <motion.div key={row.id} initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
-                <Card className="cursor-pointer">
+              <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
+                <Paper variant="outlined" className="cursor-pointer hover:shadow-md">
                   <div
-                    onClick={() => gotoExercises(row.id)}
-                    className="flex justify-center p-4 h-[210px] border-b border-gray-300"
+                    onClick={() => gotoNutritions(row.id)}
+                    className="flex justify-center p-4 h-[120px] border-b border-gray-300"
                   >
                     <img
                       src={row.thumbnail || "/img/no-image.png"}
@@ -139,16 +141,16 @@ const WorkoutList = (props) => {
                       <div className="flex items-center gap-2">
                         <Tooltip title="Edit">
                           <Icon
+                            onClick={() => editNutrition(row)}
                             className="text-gray-400 hover:text-blue-400"
-                            onClick={() => editWorkout(row)}
                           >
                             edit
                           </Icon>
                         </Tooltip>
                         <Tooltip title="Delete">
                           <Icon
+                            onClick={() => confirmDeleteNutrition(row.id)}
                             className="text-gray-400 hover:text-red-400"
-                            onClick={() => confirmDeleteWorkout(row.id)}
                           >
                             delete_forever
                           </Icon>
@@ -166,7 +168,7 @@ const WorkoutList = (props) => {
                       </Typography>
                     </motion.div>
                   </div>
-                </Card>
+                </Paper>
               </motion.div>
             </Grid>
           ))}
@@ -176,4 +178,4 @@ const WorkoutList = (props) => {
   );
 };
 
-export default WorkoutList;
+export default NutritionList;
