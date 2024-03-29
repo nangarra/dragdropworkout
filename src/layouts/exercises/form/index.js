@@ -1,4 +1,5 @@
 import {
+  CircularProgress,
   Drawer,
   FormControl,
   FormHelperText,
@@ -10,20 +11,19 @@ import {
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import Loading from "components/MDLoader";
 import Notification from "components/Notification";
 import { useMaterialUIController } from "context";
 import { setToast } from "context";
 import { navbarIconButton } from "examples/Navbars/DashboardNavbar/styles";
 import { useEffect, useState } from "react";
-import { saveWorkout } from "services/workouts";
+import { saveExercise } from "services/exercises";
 
 const style = { width: 600 };
 
 const DEFAULT_VALUES = { title: null, description: null, thumbnail: null };
 
-const WorkoutForm = (props) => {
-  const { open, onClose, workout = {} } = props;
+const ExerciseForm = (props) => {
+  const { open, onClose, exercise = {} } = props;
   const [, dispatch] = useMaterialUIController();
   const [errors, setError] = useState({ title: null });
   const [hover, setHover] = useState(false);
@@ -31,7 +31,7 @@ const WorkoutForm = (props) => {
   const [values, setValues] = useState({});
 
   useEffect(() => {
-    setValues(workout.id ? workout : DEFAULT_VALUES);
+    setValues(exercise.id ? exercise : DEFAULT_VALUES);
   }, [open]);
 
   const handleChange = (e) => {
@@ -60,10 +60,14 @@ const WorkoutForm = (props) => {
     }
     setLoading(true);
     try {
-      const response = await saveWorkout(values);
+      const response = await saveExercise(values);
       setToast(
         dispatch,
-        <Notification type="success" title="Success!" content="Workout created successfully!" />
+        <Notification
+          type="success"
+          title="Success!"
+          content={`Exercise ${exercise?.id ? "updated" : "created"}!`}
+        />
       );
       handleClose();
     } catch (error) {
@@ -96,7 +100,7 @@ const WorkoutForm = (props) => {
 
   const Header = () => (
     <Typography variant="h4" className="flex justify-between p-4 border-b">
-      {workout?.id ? "Edit" : "Add"} New Workout
+      {exercise?.id ? "Edit" : "Add"} New Exercise
       <IconButton size="small" color="inherit" sx={navbarIconButton} onClick={onClose}>
         <Icon>clear</Icon>
       </IconButton>
@@ -105,7 +109,6 @@ const WorkoutForm = (props) => {
 
   return (
     <Drawer open={open} anchor="right" PaperProps={{ style }}>
-      <Loading loading={loading} />
       <form className="flex flex-col justify-between h-full" onSubmit={handleSubmit}>
         <Header />
         <MDBox className="flex flex-col justify-start h-full overflow-y-auto p-4 gap-4">
@@ -138,7 +141,14 @@ const WorkoutForm = (props) => {
           <FormControl>
             <MDButton variant="gradient" color="primary" component="label" htmlFor="upload-file">
               <Icon>upload</Icon>&nbsp;Upload Thumbnail{" "}
-              <input hidden id="upload-file" name="thumbnail" type="file" onChange={onFileUpload} />
+              <input
+                hidden
+                id="upload-file"
+                name="thumbnail"
+                type="file"
+                accept="image/*"
+                onChange={onFileUpload}
+              />
             </MDButton>
           </FormControl>
           {values.thumbnail && (
@@ -163,7 +173,7 @@ const WorkoutForm = (props) => {
         </MDBox>
         <div className="flex justify-start items-center p-4 border-t text-white gap-2">
           <MDButton size="small" variant="gradient" color="primary" type="submit">
-            <Icon>save</Icon>&nbsp;Save
+            {loading && <CircularProgress size={10} color="white" />}&nbsp;Save
           </MDButton>
           <MDButton size="small" variant="contained" color="white" type="button" onClick={onClose}>
             Cancel
@@ -174,4 +184,4 @@ const WorkoutForm = (props) => {
   );
 };
 
-export default WorkoutForm;
+export default ExerciseForm;

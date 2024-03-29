@@ -65,7 +65,7 @@ const ExerciseForm = (props) => {
       const response = await saveExercise(values);
       setToast(
         dispatch,
-        <Notification type="success" title="Success!" content="Exercise created successfully!" />
+        <Notification type="success" title="Success!" content="Exercise created!" />
       );
       handleClose();
     } catch (error) {
@@ -140,7 +140,14 @@ const ExerciseForm = (props) => {
           <FormControl>
             <MDButton variant="gradient" color="primary" component="label" htmlFor="upload-file">
               <Icon>upload</Icon>&nbsp;Upload Thumbnail{" "}
-              <input hidden id="upload-file" name="thumbnail" type="file" onChange={onFileUpload} />
+              <input
+                hidden
+                id="upload-file"
+                name="thumbnail"
+                accept="image/*"
+                type="file"
+                onChange={onFileUpload}
+              />
             </MDButton>
           </FormControl>
           {values.thumbnail && (

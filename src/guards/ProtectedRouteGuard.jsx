@@ -3,7 +3,7 @@ import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 const UN_AUTHENTICATED_ENTRY_PATH = "/sign-in";
-const AUTHENTICATED_ENTRY_PATH = "/workouts";
+const AUTHENTICATED_ENTRY_PATH = "/exercises";
 
 const ProtectedRouteGuard = () => {
   const location = useLocation();

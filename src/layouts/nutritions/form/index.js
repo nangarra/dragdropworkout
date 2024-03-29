@@ -1,4 +1,5 @@
 import {
+  CircularProgress,
   Drawer,
   FormControl,
   FormHelperText,
@@ -10,7 +11,6 @@ import {
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
-import Loading from "components/MDLoader";
 import Notification from "components/Notification";
 import { useMaterialUIController } from "context";
 import { setToast } from "context";
@@ -63,7 +63,11 @@ const NutritionForm = (props) => {
       const response = await saveNutrition(values);
       setToast(
         dispatch,
-        <Notification type="success" title="Success!" content="Nutrition created successfully!" />
+        <Notification
+          type="success"
+          title="Success!"
+          content={`Nutrition ${nutrition?.id ? "updated" : "created"}!`}
+        />
       );
       handleClose();
     } catch (error) {
@@ -105,7 +109,6 @@ const NutritionForm = (props) => {
 
   return (
     <Drawer open={open} anchor="right" PaperProps={{ style }}>
-      <Loading loading={loading} />
       <form className="flex flex-col justify-between h-full" onSubmit={handleSubmit}>
         <Header />
         <MDBox className="flex flex-col justify-start h-full overflow-y-auto p-4 gap-4">
@@ -138,7 +141,14 @@ const NutritionForm = (props) => {
           <FormControl>
             <MDButton variant="gradient" color="primary" component="label" htmlFor="upload-file">
               <Icon>upload</Icon>&nbsp;Upload Thumbnail{" "}
-              <input hidden id="upload-file" name="thumbnail" type="file" onChange={onFileUpload} />
+              <input
+                hidden
+                id="upload-file"
+                name="thumbnail"
+                accept="image/*"
+                type="file"
+                onChange={onFileUpload}
+              />
             </MDButton>
           </FormControl>
           {values.thumbnail && (
@@ -163,7 +173,7 @@ const NutritionForm = (props) => {
         </MDBox>
         <div className="flex justify-start items-center p-4 border-t text-white gap-2">
           <MDButton size="small" variant="gradient" color="primary" type="submit">
-            <Icon>save</Icon>&nbsp;Save
+            {loading && <CircularProgress size={10} color="white" />}&nbsp;Save
           </MDButton>
           <MDButton size="small" variant="contained" color="white" type="button" onClick={onClose}>
             Cancel

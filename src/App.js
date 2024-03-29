@@ -77,7 +77,7 @@ const AllRoutes = () => {
   const { pathname } = useLocation();
 
   const authenticated = !!localStorage.getItem(TOKEN);
-  const entryPath = authenticated ? "/sign-in" : "/workouts";
+  const entryPath = authenticated ? "/sign-in" : "/exercises";
 
   // Cache for the rtl
   useMemo(() => {

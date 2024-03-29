@@ -45,6 +45,7 @@ const Exercises = () => {
   const [noExercises, setNoExercises] = useState(false);
   const [deleteExerciseId, setDeleteExerciseId] = useState(null);
   const [confirm, setConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const { workoutId } = useParams();
   const location = useLocation();
@@ -143,7 +144,9 @@ const Exercises = () => {
   };
 
   const deleteExerciseConfirmed = async () => {
+    setDeleting(true);
     const response = await deleteExercise(deleteExerciseId);
+    setDeleting(false);
     closeConfirmDeleteExercise();
     getExercisesData();
   };
@@ -171,6 +174,7 @@ const Exercises = () => {
         onClose={closeExerciseForm}
       />
       <Confirmation
+        loading={deleting}
         open={confirm}
         title="Delete Exercise"
         message="Are you sure you want to delete this exercise?"

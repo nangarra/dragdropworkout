@@ -55,7 +55,7 @@ function Basic() {
       const response = await userSignIn(values);
       localStorage.setItem(TOKEN, response.data.token);
       localStorage.setItem(LOGGED_IN_USER, JSON.stringify(response.data.user));
-      navigate("/workouts");
+      navigate("/exercises");
     } catch (error) {
       setToast(
         dispatch,

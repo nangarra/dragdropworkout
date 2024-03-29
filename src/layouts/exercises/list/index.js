@@ -1,4 +1,4 @@
-import { Card, Grid, Icon, Paper, Skeleton, Tooltip, Typography } from "@mui/material";
+import { Grid, Icon, Paper, Skeleton, Tooltip, Typography } from "@mui/material";
 import Confirmation from "components/Confirmation";
 import Loading from "components/Loading";
 import MDBox from "components/MDBox";
@@ -6,28 +6,33 @@ import MDButton from "components/MDButton";
 import { motion } from "framer-motion";
 import _ from "lodash";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getExercises, deleteExercise } from "services/exercises";
+import { deleteExercise, getExercises } from "services/exercises";
 
 const Loader = () => (
   <>
-    <Grid item xs={12} md={6} lg={3}>
-      <Skeleton variant="rectangular" className="rounded-xl w-full" height={280} />
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
     </Grid>
-    <Grid item xs={12} md={6} lg={3}>
-      <Skeleton variant="rectangular" className="rounded-xl w-full" height={280} />
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
     </Grid>
-    <Grid item xs={12} md={6} lg={3}>
-      <Skeleton variant="rectangular" className="rounded-xl w-full" height={280} />
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
     </Grid>
-    <Grid item xs={12} md={6} lg={3}>
-      <Skeleton variant="rectangular" className="rounded-xl w-full" height={280} />
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
+    </Grid>
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
+    </Grid>
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
     </Grid>
   </>
 );
 
 const NoExercises = ({ onOpen }) => (
-  <Grid item xs={12} md={6} lg={3}>
+  <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
     <Paper
       variant="outlined"
       className="rounded-xl w-full h-[280px] p-4 flex flex-col items-center justify-center gap-4"
@@ -44,12 +49,12 @@ const NoExercises = ({ onOpen }) => (
 
 const ExerciseList = (props) => {
   const { onOpen, getData } = props;
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [exercises, setExercises] = useState([]);
   const [noExercises, setNoExercises] = useState(false);
   const [hover, setHover] = useState(null);
   const [confirm, setConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [deleteExerciseId, setDeleteExerciseId] = useState(null);
 
   useEffect(() => {
@@ -67,11 +72,9 @@ const ExerciseList = (props) => {
     const response = await getExercises();
     setNoExercises(_.isEmpty(response.data));
     setExercises(response.data);
-    setLoading(false);
-  };
-
-  const gotoExercises = (id) => {
-    navigate(`/exercises/${id}`);
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
   };
 
   const editExercise = (exercise) => {
@@ -89,8 +92,9 @@ const ExerciseList = (props) => {
   };
 
   const deleteExerciseConfirmed = async () => {
+    setDeleting(true);
     const response = await deleteExercise(deleteExerciseId);
-
+    setDeleting(false);
     closeConfirmDeleteExercise();
     getExercisesData();
   };
@@ -98,6 +102,7 @@ const ExerciseList = (props) => {
   return (
     <MDBox py={3}>
       <Confirmation
+        loading={deleting}
         open={confirm}
         title="Delete Exercise"
         message="Are you sure you want to delete this exercise?"
@@ -119,12 +124,17 @@ const ExerciseList = (props) => {
               onMouseLeave={() => setHover(null)}
               onMouseEnter={() => setHover(row.id)}
             >
-              <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
-                <Paper variant="outlined" className="cursor-pointer hover:shadow-md relative">
-                  <div
-                    onClick={() => gotoExercises(row.id)}
-                    className="flex justify-center p-4 h-[140px] border-b border-gray-300"
-                  >
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <Paper
+                  variant="outlined"
+                  className="cursor-pointer hover:shadow-md relative overflow-hidden"
+                  style={{ borderRadius: 8 }}
+                >
+                  <div className="flex justify-center p-4 h-[140px] border-b border-gray-300">
                     <img
                       src={row.thumbnail || "/img/no-image.png"}
                       className={`h-full w-fit ${row.thumbnail ? "" : "opacity-50"}`}
@@ -133,10 +143,10 @@ const ExerciseList = (props) => {
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: hover === row.id ? "auto" : 0 }}
-                    className="absolute top-0 right-0 grid w-full h-[139px] justify-end overflow-hidden z-50 bg-gradient-to-r from-transparent to-gray-300"
+                    className="absolute top-0 right-0 grid w-full h-[139px] justify-end overflow-hidden z-50 bg-white"
                   >
                     <div className="flex flex-col items-center gap-2 p-2">
-                      <Tooltip title="Edit">
+                      <Tooltip title="Edit" placement="right">
                         <Icon
                           onClick={() => editExercise(row)}
                           className="text-gray-400 hover:text-blue-400"
@@ -144,7 +154,7 @@ const ExerciseList = (props) => {
                           edit
                         </Icon>
                       </Tooltip>
-                      <Tooltip title="Delete">
+                      <Tooltip title="Delete" placement="right">
                         <Icon
                           onClick={() => confirmDeleteExercise(row.id)}
                           className="text-gray-400 hover:text-red-400"
@@ -154,12 +164,12 @@ const ExerciseList = (props) => {
                       </Tooltip>
                     </div>
                   </motion.div>
-                  <div className="p-4">
+                  <div className="py-2 px-4">
                     <Typography
                       gutterBottom
-                      variant="h6"
+                      variant="p"
                       component="div"
-                      className="flex items-center justify-between"
+                      className="flex items-center justify-between text-sm font-semibold"
                     >
                       <span>{row.title}</span>
                     </Typography>

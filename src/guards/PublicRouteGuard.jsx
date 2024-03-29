@@ -2,7 +2,7 @@ import { TOKEN } from "constants";
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
-const AUTHENTICATED_ENTRY_PATH = "/workouts";
+const AUTHENTICATED_ENTRY_PATH = "/exercises";
 
 const PublicRouteGuard = () => {
   const token = localStorage.getItem(TOKEN);

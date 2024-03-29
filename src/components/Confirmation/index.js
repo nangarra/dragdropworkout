@@ -1,4 +1,5 @@
 import {
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -9,7 +10,7 @@ import MDButton from "components/MDButton";
 import React from "react";
 
 const Confirmation = (props) => {
-  const { open, title, message, onClose, onConfirm } = props;
+  const { open, title, message, onClose, onConfirm, loading } = props;
   return (
     <Dialog
       fullScreen={false}
@@ -26,7 +27,7 @@ const Confirmation = (props) => {
           Cancel
         </MDButton>
         <MDButton size="small" variant="gradient" color="error" onClick={onConfirm}>
-          Confirm
+          {loading && <CircularProgress size={10} color="white" />}&nbsp;Confirm
         </MDButton>
       </DialogActions>
     </Dialog>
