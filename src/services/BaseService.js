@@ -5,7 +5,7 @@ import { TOKEN } from "constants";
 import { Navigate } from "react-router-dom";
 
 const unauthorizedCode = [401];
-const UN_AUTHENTICATED_ENTRY_PATH = "/sign-in";
+const UN_AUTHENTICATED_ENTRY_PATH = "/admin/sign-in";
 
 const BaseService = axios.create({
   baseURL: SERVER_API,

@@ -2,8 +2,8 @@ import { TOKEN } from "constants";
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-const UN_AUTHENTICATED_ENTRY_PATH = "/sign-in";
-const AUTHENTICATED_ENTRY_PATH = "/exercises";
+const UN_AUTHENTICATED_ENTRY_PATH = "/admin/sign-in";
+const AUTHENTICATED_ENTRY_PATH = "/admin/exercises";
 
 const ProtectedRouteGuard = () => {
   const location = useLocation();

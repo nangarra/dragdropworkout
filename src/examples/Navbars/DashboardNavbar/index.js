@@ -102,7 +102,7 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
     await userSignOut();
     localStorage.removeItem(TOKEN);
     localStorage.removeItem(LOGGED_IN_USER);
-    navigate("/sign-in");
+    navigate("/admin/sign-in");
   };
 
   // Render the notifications menu

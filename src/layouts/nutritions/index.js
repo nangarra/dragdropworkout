@@ -7,6 +7,7 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { useEffect, useState } from "react";
 import NutritionForm from "./form";
 import NutritionList from "./list";
+import Filters from "./list/filters";
 
 const Nutritions = () => {
   const [openNutritionForm, setOpenNutritionForm] = useState(false);
@@ -42,6 +43,7 @@ const Nutritions = () => {
         nutrition={selectedNutrition}
         onClose={closeNutritionForm}
       />
+      <Filters />
       <NutritionList getData={getData} onOpen={handleOpenNutritionForm} />
       <Footer />
     </DashboardLayout>

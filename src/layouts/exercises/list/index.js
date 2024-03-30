@@ -100,7 +100,7 @@ const ExerciseList = (props) => {
   };
 
   return (
-    <MDBox py={3}>
+    <MDBox>
       <Confirmation
         loading={deleting}
         open={confirm}

@@ -28,10 +28,12 @@ import PageLayout from "examples/LayoutContainers/PageLayout";
 
 // Authentication pages components
 import Footer from "layouts/authentication/components/Footer";
+import Header from "examples/Header";
 
 function BasicLayout({ image, children }) {
   return (
     <PageLayout>
+      <Header />
       <MDBox
         position="absolute"
         width="100%"
