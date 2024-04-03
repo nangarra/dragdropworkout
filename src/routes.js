@@ -39,7 +39,7 @@ const protectedRoutes = [
     icon: <Icon fontSize="small">fitness_center</Icon>,
     route: "/admin/workouts",
     links: ["workouts"],
-    component: lazy(() => import("layouts/workouts/index.js")),
+    component: lazy(() => import("layouts/admin-workouts/index.js")),
   },
   // {
   //   type: "collapse",
@@ -108,14 +108,22 @@ const publicRoutes = [
     route: "/admin/sign-in",
     component: lazy(() => import("layouts/authentication/sign-in/index.js")),
   },
-  // {
-  //   type: "collapse",
-  //   name: "Home",
-  //   key: "sign-in",
-  //   icon: <Icon fontSize="small">login</Icon>,
-  //   route: "/",
-  //   component: lazy(() => import("layouts/home/index.js")),
-  // },
+  {
+    type: "collapse",
+    name: "Workouts",
+    key: "workouts",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/workouts",
+    component: lazy(() => import("layouts/workouts/index.js")),
+  },
+  {
+    type: "collapse",
+    name: "Workout Builder",
+    key: "workout-builder",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/workout-builder",
+    component: lazy(() => import("layouts/workout-builder/index.js")),
+  },
 ];
 
 const routes = {

@@ -1,9 +1,31 @@
 import MDButton from "components/MDButton";
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+
+const navLinks = [
+  {
+    key: 1,
+    path: "/workout-builder",
+    label: "workout builder",
+  },
+  {
+    key: 2,
+    path: "/workouts",
+    label: "workouts",
+  },
+  {
+    key: 3,
+    path: "/about-us",
+    label: "about us",
+  },
+];
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const location = useLocation();
+
+  console.log("path", location.pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,13 +40,15 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition duration-300 ease-in-out py-4 ${
-        isScrolled ? "bg-[#192043]" : "bg-transparent"
+        isScrolled ? "bg-[#7560C5]" : "bg-white "
       }`}
     >
       <div className="flex justify-between items-center container mx-auto">
         {/* Logo or Title */}
         <NavLink to="/">
-          <div className="text-[#7560C5] text-[25px] cursor-pointer">
+          <div
+            className={`${isScrolled ? "text-white" : "text-[#7560C5]"} text-[25px] cursor-pointer`}
+          >
             <span className="">Drag</span>
             <span className="font-semibold">Drop</span>
             <span className="font-bold">Workout</span>
@@ -33,40 +57,19 @@ const Header = () => {
 
         {/* Nav Links */}
         <nav className="hidden md:flex gap-8 text-sm">
-          <a
-            href="#"
-            className="text-[#7560C5] hover:text-[#7560C5]/70 transition duration-300 ease-in-out"
-          >
-            Home
-          </a>
-          <a
-            href="#"
-            className="text-[#7560C5] hover:text-[#7560C5]/70 transition duration-300 ease-in-out"
-          >
-            Features
-          </a>
-          <a
-            href="#"
-            className="text-[#7560C5] hover:text-[#7560C5]/70 transition duration-300 ease-in-out"
-          >
-            About Us
-          </a>
+          {navLinks.map((nav) => (
+            <NavLink
+              to={nav.path}
+              className={`${isScrolled ? "text-white" : "text-[#7560C5]"} ${
+                location.pathname === nav.path ? "font-bold" : "font-normal"
+              } transition duration-300 ease-in-out uppercase`}
+            >
+              {nav.label}
+            </NavLink>
+          ))}
         </nav>
 
         {/* Admin Button */}
-        <div className="flex items-center gap-4">
-          <NavLink to="/">
-            <MDButton size="small" variant="contained" color="primary" type="submit">
-              Workout Builder
-            </MDButton>
-          </NavLink>
-
-          {/* <NavLink to="/admin/sign-in">
-            <MDButton size="small" variant="text" color="white" type="submit">
-              Admin
-            </MDButton>
-          </NavLink> */}
-        </div>
       </div>
     </header>
   );

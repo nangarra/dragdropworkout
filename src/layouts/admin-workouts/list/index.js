@@ -183,74 +183,80 @@ const WorkoutList = (props) => {
   const columns = useMemo(() => cols, columnHeaders);
 
   return (
-    <div className="container flex flex-col gap-4 py-4">
-      <Card>
-        <MDBox
-          mx={2}
-          mt={-3}
-          py={3}
-          px={2}
-          variant="gradient"
-          bgColor="primary"
-          borderRadius="lg"
-          coloredShadow="primary"
-        >
-          <MDTypography variant="h6" color="white">
-            Workout Listings
-          </MDTypography>
-        </MDBox>
-        <MDBox pt={3}>
-          <Grid container spacing={2} className="p-4">
-            <Grid item xl={1.2}>
-              <MDButton
-                className="w-full"
-                size="large"
-                variant={filter === "popular" ? "gradient" : "outlined"}
-                color="primary"
-                onClick={() => changeFilter("popular")}
-              >
-                Populer
-              </MDButton>
-            </Grid>
-            <Grid item xl={1.2}>
-              <MDButton
-                className="w-full"
-                size="large"
-                variant={filter === "recent" ? "gradient" : "outlined"}
-                color="primary"
-                onClick={() => changeFilter("recent")}
-              >
-                Recent
-              </MDButton>
-            </Grid>
-            <Grid item xl={1.2}>
-              <MDButton
-                className="w-full"
-                size="large"
-                variant={filter === "old" ? "gradient" : "outlined"}
-                color="primary"
-                onClick={() => changeFilter("old")}
-              >
-                Old
-              </MDButton>
-            </Grid>
-          </Grid>
-        </MDBox>
-      </Card>
-      <Card>
-        <Loading loading={loading} customLoader={<Loader />}>
-          <MDBox>
-            <DataTable
-              table={{ columns, rows: workouts }}
-              isSorted={false}
-              entriesPerPage={{ defaultValue: 10, entries: [10, 25, 50, 100] }}
-              showTotalEntries
-              noEndBorder
-            />
-          </MDBox>
-        </Loading>
-      </Card>
-    </div>
+    <MDBox pt={4} pb={3}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Card>
+            <MDBox
+              mx={2}
+              mt={-3}
+              py={3}
+              px={2}
+              variant="gradient"
+              bgColor="primary"
+              borderRadius="lg"
+              coloredShadow="primary"
+            >
+              <MDTypography variant="h6" color="white">
+                Workout Listings
+              </MDTypography>
+            </MDBox>
+            <MDBox pt={3}>
+              <Grid container spacing={2} className="p-4">
+                <Grid item xl={1.2}>
+                  <MDButton
+                    className="w-full"
+                    size="large"
+                    variant={filter === "popular" ? "gradient" : "outlined"}
+                    color="primary"
+                    onClick={() => changeFilter("popular")}
+                  >
+                    Populer
+                  </MDButton>
+                </Grid>
+                <Grid item xl={1.2}>
+                  <MDButton
+                    className="w-full"
+                    size="large"
+                    variant={filter === "recent" ? "gradient" : "outlined"}
+                    color="primary"
+                    onClick={() => changeFilter("recent")}
+                  >
+                    Recent
+                  </MDButton>
+                </Grid>
+                <Grid item xl={1.2}>
+                  <MDButton
+                    className="w-full"
+                    size="large"
+                    variant={filter === "old" ? "gradient" : "outlined"}
+                    color="primary"
+                    onClick={() => changeFilter("old")}
+                  >
+                    Old
+                  </MDButton>
+                </Grid>
+              </Grid>
+            </MDBox>
+          </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Card>
+            <Loading loading={loading} customLoader={<Loader />}>
+              <MDBox>
+                <DataTable
+                  table={{ columns, rows: workouts }}
+                  isSorted={false}
+                  entriesPerPage={{ defaultValue: 10, entries: [10, 25, 50, 100] }}
+                  showTotalEntries
+                  noEndBorder
+                />
+              </MDBox>
+            </Loading>
+          </Card>
+        </Grid>
+      </Grid>
+    </MDBox>
   );
 };
 

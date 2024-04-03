@@ -1,7 +1,8 @@
+import Footer from "examples/Footer";
+import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { useEffect, useState } from "react";
 import WorkoutList from "./list";
-import BasicLayout from "layouts/authentication/components/BasicLayout";
-import MDBox from "components/MDBox";
 
 const Workouts = () => {
   const [getData, setGetData] = useState(false);
@@ -15,9 +16,11 @@ const Workouts = () => {
   }, [getData]);
 
   return (
-    <BasicLayout>
+    <DashboardLayout>
+      <DashboardNavbar />
       <WorkoutList getData={getData} />
-    </BasicLayout>
+      <Footer />
+    </DashboardLayout>
   );
 };
 
