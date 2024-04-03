@@ -10,7 +10,13 @@ function PublicFooter({ company, links, className }) {
   const { size } = typography;
 
   return (
-    <div className="bg-[#7560C5] text-white w-full fixed bottom-0">
+    <MDBox
+      width="100%"
+      variant="gradient"
+      bgColor="primary"
+      coloredShadow="primary"
+      className="fixed bottom-0"
+    >
       <div className="flex items-center justify-between container mx-auto h-[200px]">
         <MDBox
           display="flex"
@@ -35,7 +41,7 @@ function PublicFooter({ company, links, className }) {
           for a better web.
         </MDBox>
       </div>
-    </div>
+    </MDBox>
   );
 }
 

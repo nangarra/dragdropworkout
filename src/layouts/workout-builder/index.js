@@ -311,7 +311,7 @@ const WorkoutBuilder = () => {
                 <Grid item xs={3}>
                   <div className="flex justify-end items-start h-full">
                     <MDButton
-                      variant="contained"
+                      variant="gradient"
                       color="primary"
                       // size="small"
                       onClick={() => setDescEdit(false)}
