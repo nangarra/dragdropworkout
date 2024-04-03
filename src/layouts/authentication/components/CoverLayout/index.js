@@ -1,75 +1,75 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
-
-// @mui material components
-import Grid from "@mui/material/Grid";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-// import MDTypography from "components/MDTypography";
-
-// Material Dashboard 2 React example components
-import DefaultNavbar from "examples/Navbars/DefaultNavbar";
 import PageLayout from "examples/LayoutContainers/PageLayout";
-
-// Authentication layout components
 import Footer from "layouts/authentication/components/Footer";
+import { NavLink } from "react-router-dom";
 
+const Cover = ({ image }) => (
+  <div className="relative h-full">
+    <div className="absolute top-0 w-full p-4">
+      <NavLink to="/">
+        <div className="text-white text-[35px] cursor-pointer bg-none w-full text-center">
+          <span className="">Drag</span>
+          <span className="font-semibold">Drop</span>
+          <span className="font-bold">Workout</span>
+        </div>
+      </NavLink>
+    </div>
+    <MDBox
+      minHeight="100vh"
+      sx={{
+        backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
+          image &&
+          `${linearGradient(
+            rgba(gradients.dark.main, 0.4),
+            rgba(gradients.dark.state, 0.4)
+          )}, url(${image})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    />
+    <Footer light />
+  </div>
+);
 function CoverLayout({ coverHeight, image, children }) {
   return (
     <PageLayout>
-      <DefaultNavbar
-        action={{
-          type: "external",
-          route: "https://creative-tim.com/product/material-dashboard-react",
-          label: "free download",
-        }}
-        transparent
-        light
-      />
-      <MDBox
-        width="calc(100% - 2rem)"
-        minHeight={coverHeight}
-        borderRadius="xl"
-        mx={2}
-        my={2}
-        pt={6}
-        pb={28}
-        sx={{
-          backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
-            image &&
-            `${linearGradient(
-              rgba(gradients.dark.main, 0.4),
-              rgba(gradients.dark.state, 0.4)
-            )}, url(${image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
-      <MDBox mt={{ xs: -20, lg: -18 }} px={1} width="calc(100% - 2rem)" mx="auto">
-        <Grid container spacing={1} justifyContent="center">
-          <Grid item xs={11} sm={9} md={5} lg={4} xl={3}>
-            {children}
-          </Grid>
-        </Grid>
-      </MDBox>
-      <Footer />
+      <div className="grid grid-cols-2">
+        <div className="relative h-full hidden md:block">
+          <div className="absolute top-0 w-full p-4">
+            <NavLink to="/">
+              <div className="text-white text-[35px] cursor-pointer bg-none w-full text-center">
+                <span className="">Drag</span>
+                <span className="font-semibold">Drop</span>
+                <span className="font-bold">Workout</span>
+              </div>
+            </NavLink>
+          </div>
+          <MDBox
+            minHeight="100vh"
+            sx={{
+              backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
+                image &&
+                `${linearGradient(
+                  rgba(gradients.dark.main, 0.4),
+                  rgba(gradients.dark.state, 0.4)
+                )}, url(${image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          />
+          <Footer light />
+        </div>
+
+        <div className="absolute block md:hidden top-0 right-0 bottom-0 left-0 w-full h-full">
+          <Cover image={image} />
+        </div>
+        <div className="grid items-center h-[100vh] w-full justify-center col-span-2 md:col-span-1">
+          {children}
+        </div>
+      </div>
     </PageLayout>
   );
 }

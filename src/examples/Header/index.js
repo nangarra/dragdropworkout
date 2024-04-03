@@ -24,7 +24,7 @@ const Header = () => {
       <div className="flex justify-between items-center container mx-auto">
         {/* Logo or Title */}
         <NavLink to="/">
-          <div className="text-white text-[25px] cursor-pointer">
+          <div className="text-[#7560C5] text-[25px] cursor-pointer">
             <span className="">Drag</span>
             <span className="font-semibold">Drop</span>
             <span className="font-bold">Workout</span>
@@ -35,19 +35,19 @@ const Header = () => {
         <nav className="hidden md:flex gap-8 text-sm">
           <a
             href="#"
-            className="text-white hover:text-gray-300 transition duration-300 ease-in-out"
+            className="text-[#7560C5] hover:text-[#7560C5]/70 transition duration-300 ease-in-out"
           >
             Home
           </a>
           <a
             href="#"
-            className="text-white hover:text-gray-300 transition duration-300 ease-in-out"
+            className="text-[#7560C5] hover:text-[#7560C5]/70 transition duration-300 ease-in-out"
           >
             Features
           </a>
           <a
             href="#"
-            className="text-white hover:text-gray-300 transition duration-300 ease-in-out"
+            className="text-[#7560C5] hover:text-[#7560C5]/70 transition duration-300 ease-in-out"
           >
             About Us
           </a>
@@ -56,7 +56,7 @@ const Header = () => {
         {/* Admin Button */}
         <div className="flex items-center gap-4">
           <NavLink to="/">
-            <MDButton size="small" variant="contained" color="white" type="submit">
+            <MDButton size="small" variant="contained" color="primary" type="submit">
               Workout Builder
             </MDButton>
           </NavLink>

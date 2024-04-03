@@ -52,7 +52,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
   const location = useLocation();
   const collapseName = location.pathname.replace("/", "");
 
-  let textColor = "purple";
+  let textColor = "#7560C5";
 
   if (transparentSidenav || (whiteSidenav && !darkMode)) {
     textColor = "dark";
@@ -116,7 +116,6 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
         returnValue = (
           <MDTypography
             key={key}
-            color={textColor}
             display="block"
             variant="caption"
             fontWeight="bold"
@@ -125,6 +124,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             mt={2}
             mb={1}
             ml={1}
+            className="text-[#7560C5]"
           >
             {/* {title} */}
             <span className="">Drag</span>
@@ -174,7 +174,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             width={!brandName && "100%"}
             // sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
           >
-            <div className="flex items-center">
+            <div className="flex items-center text-[#7560C5]">
               <span>Drag</span>
               <span className="font-semibold">Drop</span>
               <span className="font-bold">Workout</span>

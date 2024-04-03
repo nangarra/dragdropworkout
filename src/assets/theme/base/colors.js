@@ -45,7 +45,7 @@ const colors = {
   },
 
   primary: {
-    main: "#4052AB",
+    main: "#7560C5",
     focus: "#5262a8",
   },
 
@@ -98,7 +98,7 @@ const colors = {
 
   gradients: {
     primary: {
-      main: "#4052AB",
+      main: "#7560C5",
       state: "#5262a8",
     },
 
@@ -201,7 +201,7 @@ const colors = {
   },
   badgeColors: {
     primary: {
-      background: "#4052AB",
+      background: "#7560C5",
       text: "#cc084b",
     },
 
@@ -242,7 +242,7 @@ const colors = {
   },
 
   coloredShadows: {
-    primary: "#4052AB",
+    primary: "#7560C5",
     secondary: "#110e0e",
     info: "#00bbd4",
     success: "#4caf4f",

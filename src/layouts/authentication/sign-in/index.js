@@ -15,9 +15,6 @@ import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import MDTypography from "components/MDTypography";
 
-// Authentication layout components
-import BasicLayout from "layouts/authentication/components/BasicLayout";
-
 // Images
 import bgImage from "assets/images/basic-bg.jpg";
 import Notification from "components/Notification";
@@ -25,6 +22,7 @@ import { LOGGED_IN_USER, TOKEN } from "constants";
 import { setToast, useMaterialUIController } from "context";
 import { userSignIn } from "services/auth";
 import { CircularProgress } from "@mui/material";
+import CoverLayout from "../components/CoverLayout";
 
 function Basic() {
   const [, dispatch] = useMaterialUIController();
@@ -70,8 +68,8 @@ function Basic() {
   };
 
   return (
-    <BasicLayout image={bgImage}>
-      <Card>
+    <CoverLayout image={bgImage}>
+      <Card style={{ width: 350 }}>
         <MDBox
           variant="gradient"
           bgColor="primary"
@@ -137,7 +135,7 @@ function Basic() {
           </MDBox>
         </MDBox>
       </Card>
-    </BasicLayout>
+    </CoverLayout>
   );
 }
 
