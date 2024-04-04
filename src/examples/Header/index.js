@@ -21,11 +21,8 @@ const navLinks = [
 ];
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-
   const location = useLocation();
-
-  console.log("path", location.pathname);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,6 +56,7 @@ const Header = () => {
         <nav className="hidden md:flex gap-8 text-sm">
           {navLinks.map((nav) => (
             <NavLink
+              key={nav.key}
               to={nav.path}
               className={`${isScrolled ? "text-white" : "text-[#7560C5]"} ${
                 location.pathname === nav.path ? "font-bold" : "font-normal"

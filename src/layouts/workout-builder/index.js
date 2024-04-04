@@ -1,10 +1,15 @@
 import {
+  AppBar,
   CircularProgress,
   Grid,
   Icon,
+  IconButton,
   Input,
   InputAdornment,
   Paper,
+  Tab,
+  Tabs,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import MDBox from "components/MDBox";
@@ -28,6 +33,11 @@ import classNames from "classnames";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import MDInput from "components/MDInput";
 import { AccountCircle } from "@mui/icons-material";
+import { getNutritions } from "services/nutritions";
+import NutritionsList from "./list/nutritions";
+import ExercisesList from "./list/exercises";
+import SelectedExercises from "./list/selectedExercises";
+import { DragDropContext } from "react-beautiful-dnd";
 
 const NoExercises = ({ onOpen }) => (
   <Grid container spacing={3}>
@@ -47,27 +57,24 @@ const NoExercises = ({ onOpen }) => (
   </Grid>
 );
 
-const StyledInput = ({ placeholder, ...otherProps }) => {
-  return (
-    <Input
-      classes={{
-        root: "border border-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white/50",
-        input: "text-white bg-transparent placeholder-white/75",
-      }}
-      placeholder={placeholder}
-      startAdornment={
-        <InputAdornment position="start">
-          <Icon className="text-white">search</Icon>
-        </InputAdornment>
-      }
-      {...otherProps}
-    />
-  );
-};
-
 const INITIAL_STATE = {
   title: "Workout title",
   description: "Workout description",
+};
+
+const TABS = {
+  EXERCISES: 0,
+  NUTRITIONS: 1,
+};
+
+const TabContent = ({ children, selectedTab, ...props }) => {
+  if (selectedTab === TABS.EXERCISES) {
+    return <ExercisesList {...props} />;
+  }
+
+  if (selectedTab === TABS.NUTRITIONS) {
+    return <NutritionsList {...props} />;
+  }
 };
 
 const WorkoutBuilder = () => {
@@ -81,7 +88,6 @@ const WorkoutBuilder = () => {
   const [confirm, setConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const { workoutId } = useParams();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const viewOnly = !!searchParams.get("type");
@@ -89,24 +95,52 @@ const WorkoutBuilder = () => {
   const [workout, setWorkout] = useState(INITIAL_STATE);
   const [titleEdit, setTitleEdit] = useState(false);
   const [descEdit, setDescEdit] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(TABS.EXERCISES);
+  const [exercises, setExercises] = useState([]);
+  const [nutritions, setNutritions] = useState([]);
+  const [selected, setSelected] = useState([]);
+  const [hoveredPlace, setHoveredPlace] = useState(null);
 
   useEffect(() => {
     getExercisesData();
+    getNutritionsData();
   }, []);
 
   const getExercisesData = async (options = {}) => {
     setLoading(true);
     try {
-      options.workoutId = workoutId;
       const response = await getExercises(options);
       setNoExercises(_.isEmpty(response.data));
-      const selected = _.orderBy(
-        _.filter(response.data, (row) => !!row.SelectedExercise?.id),
-        ["sequence"],
-        ["asc"]
+      // const selected = _.orderBy(
+      //   _.filter(response.data, (row) => !!row.SelectedExercise?.id),
+      //   ["sequence"],
+      //   ["asc"]
+      // );
+      // const exercises = _.filter(response.data, (row) => !row.SelectedExercise?.id);
+      // setItems({ selected, exercises });
+      setExercises(response.data);
+    } catch (error) {
+      setToast(
+        dispatch,
+        <Notification type="error" title="Something went wrong!" content={error?.message} />
       );
-      const exercises = _.filter(response.data, (row) => !row.SelectedExercise?.id);
-      setItems({ selected, exercises });
+    }
+    setLoading(false);
+  };
+
+  const getNutritionsData = async (options = {}) => {
+    setLoading(true);
+    try {
+      const response = await getNutritions(options);
+      setNoExercises(_.isEmpty(response.data));
+      // const selected = _.orderBy(
+      //   _.filter(response.data, (row) => !!row.SelectedExercise?.id),
+      //   ["sequence"],
+      //   ["asc"]
+      // );
+      // const exercises = _.filter(response.data, (row) => !row.SelectedExercise?.id);
+      // setItems({ selected, exercises });
+      setNutritions(response.data);
     } catch (error) {
       setToast(
         dispatch,
@@ -120,6 +154,7 @@ const WorkoutBuilder = () => {
     setOpenExerciseForm(false);
     setSelectedExercise({});
     getExercisesData();
+    getNutritionsData();
   };
 
   const handleOpenExerciseForm = (exercise) => {
@@ -145,23 +180,21 @@ const WorkoutBuilder = () => {
   };
 
   const handleClearSelected = () => {
-    const selected = _.cloneDeep(items.selected);
-    const list = [...selected, ..._.cloneDeep(items.exercises)];
-    setItems({
-      selected: [],
-      exercises: list,
-    });
+    getExercisesData();
+    getNutritionsData();
+    setSelected([]);
   };
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await saveWorkoutExercises(workoutId, items.selected);
+      const response = await saveWorkoutExercises(items.selected);
       setToast(
         dispatch,
         <Notification type="success" title="Success!" content="Workout plan created!" />
       );
       getExercisesData();
+      getNutritionsData();
     } catch (error) {
       setToast(
         dispatch,
@@ -169,24 +202,6 @@ const WorkoutBuilder = () => {
       );
     }
     setLoading(false);
-  };
-
-  const confirmDeleteExercise = (id) => {
-    setConfirm(true);
-    setDeleteExerciseId(id);
-  };
-
-  const closeConfirmDeleteExercise = () => {
-    setConfirm(false);
-    setDeleteExerciseId(null);
-  };
-
-  const deleteExerciseConfirmed = async () => {
-    setDeleting(true);
-    const response = await deleteExercise(deleteExerciseId);
-    setDeleting(false);
-    closeConfirmDeleteExercise();
-    getExercisesData();
   };
 
   const copyToClipboard = async () => {
@@ -204,156 +219,225 @@ const WorkoutBuilder = () => {
 
   const handleWorkoutChange = (e) => {
     const { value, name } = e.target;
-
     setWorkout((prev) => ({ ...prev, [name]: value }));
+  };
 
-    console.log("value", value);
-    console.log("name", name);
+  const handleTabChange = (_, value) => {
+    setSelectedTab(value);
+  };
+
+  const onDragEnd = (result) => {
+    setHoveredPlace(null);
+    if (!result.destination) return;
+
+    const selectedExercises = _.cloneDeep(selected);
+    console.log("onDragEnd", result);
+    console.log("condition 1", String(result.destination.droppableId).includes("selected"));
+    console.log("condition 2", String(result.source.droppableId) === "even");
+
+    console.log("destination", result.destination.droppableId);
+    console.log("source", result.source.droppableId);
+
+    if (
+      String(result.destination.droppableId) !== "even" &&
+      String(result.destination.droppableId) !== "odd" &&
+      (String(result.source.droppableId) === "even" || String(result.source.droppableId) === "odd")
+    ) {
+      const draggedItem =
+        _.find(exercises, (row) => row.id === result.draggableId) ||
+        _.find(nutritions, (row) => row.id === result.draggableId);
+
+      console.log("dragged to Selected", draggedItem);
+
+      if (_.isEmpty(selected)) {
+        selectedExercises.push(draggedItem);
+        setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+        setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+      } else if (+result.destination.droppableId > selectedExercises.length) {
+        selectedExercises.push(draggedItem);
+        setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+        setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+      } else {
+      }
+    }
+
+    setSelected(selectedExercises);
+  };
+
+  const onDragUpdate = (result) => {
+    if (!result.destination) {
+      setHoveredPlace(null);
+      return;
+    }
+    setHoveredPlace(result.destination?.droppableId);
   };
 
   return (
     <BasicLayout>
-      <ExerciseForm
-        open={openExerciseForm}
-        exercise={selectedExercise}
-        onClose={closeExerciseForm}
-      />
-      <Confirmation
-        loading={deleting}
-        open={confirm}
-        title="Delete Exercise"
-        message="Are you sure you want to delete this exercise?"
-        onClose={closeConfirmDeleteExercise}
-        onConfirm={deleteExerciseConfirmed}
-      />
-
       <div className="container mx-auto">
-        <Grid container spacing={4}>
-          <Grid item xs={9}>
-            <div className="flex flex-col gap-4">
-              <Grid container spacing={4}>
-                <Grid item xs={9}>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center gap-4 h-[40px]">
-                      {titleEdit ? (
-                        <Input
-                          name="title"
-                          className="w-full"
-                          style={{ fontSize: 30 }}
-                          placeholder="Title"
-                          value={workout.title}
-                          onChange={handleWorkoutChange}
-                        />
-                      ) : (
-                        <Typography variant="h3">{workout.title}</Typography>
-                      )}
-                      {titleEdit ? (
-                        <MDButton
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          onClick={() => setTitleEdit(false)}
-                        >
-                          Done
-                        </MDButton>
-                      ) : (
-                        <MDButton
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          onClick={() => setTitleEdit(true)}
-                        >
-                          Edit
-                        </MDButton>
-                      )}
+        <Grid container spacing={2}>
+          <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
+            {/* --------------- Selected Exercises & Nutritions */}
+            <Grid item xs={8}>
+              <div className="flex flex-col gap-4">
+                <Grid container spacing={4}>
+                  <Grid item xs={9}>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex justify-between items-center gap-4 h-[40px]">
+                        {titleEdit ? (
+                          <Input
+                            name="title"
+                            className="w-full"
+                            style={{ fontSize: 30 }}
+                            placeholder="Title"
+                            value={workout.title}
+                            onChange={handleWorkoutChange}
+                          />
+                        ) : (
+                          <Typography variant="h3">{workout.title}</Typography>
+                        )}
+                        {titleEdit ? (
+                          <MDButton
+                            variant="gradient"
+                            color="primary"
+                            size="small"
+                            onClick={() => setTitleEdit(false)}
+                          >
+                            Done
+                          </MDButton>
+                        ) : (
+                          <MDButton
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            onClick={() => setTitleEdit(true)}
+                          >
+                            Edit
+                          </MDButton>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center gap-4 h-[40px]">
+                        {descEdit ? (
+                          <Input
+                            multiline
+                            name="description"
+                            className="w-full"
+                            style={{ fontSize: 18 }}
+                            placeholder="Description"
+                            value={workout.description}
+                            onChange={handleWorkoutChange}
+                          />
+                        ) : (
+                          <Typography
+                            variant="body2"
+                            className="flex justify-between items-center gap-4 h-[40px]"
+                          >
+                            {workout.description}
+                          </Typography>
+                        )}
+                        {descEdit ? (
+                          <MDButton
+                            variant="gradient"
+                            color="primary"
+                            size="small"
+                            onClick={() => setDescEdit(false)}
+                          >
+                            Done
+                          </MDButton>
+                        ) : (
+                          <MDButton
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            onClick={() => setDescEdit(true)}
+                          >
+                            Edit
+                          </MDButton>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center gap-4 h-[40px]">
-                      {descEdit ? (
-                        <Input
-                          multiline
-                          name="description"
-                          className="w-full"
-                          style={{ fontSize: 18 }}
-                          placeholder="Description"
-                          value={workout.description}
-                          onChange={handleWorkoutChange}
-                        />
-                      ) : (
-                        <Typography
-                          variant="body2"
-                          className="flex justify-between items-center gap-4 h-[40px]"
-                        >
-                          {workout.description}
-                        </Typography>
-                      )}
-                      {descEdit ? (
-                        <MDButton
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          onClick={() => setDescEdit(false)}
-                        >
-                          Done
-                        </MDButton>
-                      ) : (
-                        <MDButton
-                          variant="outlined"
-                          color="primary"
-                          size="small"
-                          onClick={() => setDescEdit(true)}
-                        >
-                          Edit
-                        </MDButton>
-                      )}
+                  </Grid>
+                  <Grid item xs={3}>
+                    <div className="flex justify-end items-end h-full gap-2">
+                      <Tooltip title="Reset">
+                        <div className="border rounded-full border-[#7560C5] bg-white">
+                          <IconButton
+                            color="primary"
+                            aria-label="Add"
+                            onClick={handleClearSelected}
+                          >
+                            <Icon fontSize="small">refresh</Icon>
+                          </IconButton>
+                        </div>
+                      </Tooltip>
+                      <Tooltip title="Send">
+                        <div className="border rounded-full border-[#7560C5] bg-white">
+                          <IconButton
+                            color="primary"
+                            aria-label="Add"
+                            onClick={() => setDescEdit(false)}
+                          >
+                            <Icon fontSize="small">send</Icon>
+                          </IconButton>
+                        </div>
+                      </Tooltip>
+                      <Tooltip title="Save">
+                        <div className="border rounded-full border-[#7560C5] bg-white">
+                          <IconButton
+                            color="primary"
+                            aria-label="Add"
+                            onClick={() => setDescEdit(false)}
+                          >
+                            <Icon fontSize="small">save</Icon>
+                          </IconButton>
+                        </div>
+                      </Tooltip>
                     </div>
-                  </div>
+                  </Grid>
                 </Grid>
-                <Grid item xs={3}>
-                  <div className="flex justify-end items-start h-full">
-                    <MDButton
-                      variant="gradient"
-                      color="primary"
-                      // size="small"
-                      onClick={() => setDescEdit(false)}
-                    >
-                      Save & Send
-                    </MDButton>
-                  </div>
-                </Grid>
-              </Grid>
-              <MDBox width="100%" p={4} bgColor="white" className="rounded-xl">
-                asd
-              </MDBox>
-            </div>
-          </Grid>
-          <Grid item xs={3}>
-            <div className="flex flex-col gap-5">
-              <MDBox
-                width="100%"
-                px={4}
-                pb={4}
-                pt={3}
-                variant="gradient"
-                bgColor="primary"
-                borderRadius="lg"
-                coloredShadow="primary"
-              >
-                <Input
-                  style={{ color: "white", width: "100%", fontSize: 18 }}
-                  placeholder="Search by name"
-                  color="secondary"
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <Icon className="text-white">search</Icon>
-                    </InputAdornment>
-                  }
-                />
-              </MDBox>
-              <MDBox width="100%" p={4} bgColor="white" className="rounded-xl">
-                asd
-              </MDBox>
-            </div>
-          </Grid>
+                <MDBox width="100%" p={4} bgColor="white" className="rounded-xl">
+                  <SelectedExercises data={selected} hoveredPlace={hoveredPlace} />
+                </MDBox>
+              </div>
+            </Grid>
+
+            {/* --------------- Exercises & Nutritions */}
+            <Grid item xs={4}>
+              <div className="flex flex-col gap-5">
+                <MDBox
+                  width="100%"
+                  px={4}
+                  pb={4}
+                  pt={3}
+                  variant="gradient"
+                  bgColor="primary"
+                  borderRadius="lg"
+                  coloredShadow="primary"
+                >
+                  <Input
+                    style={{ color: "white", width: "100%", fontSize: 18 }}
+                    placeholder="Search by name"
+                    color="secondary"
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Icon className="text-white">search</Icon>
+                      </InputAdornment>
+                    }
+                  />
+                </MDBox>
+                <MDBox width="100%" p={2} bgColor="white" className="rounded-xl">
+                  <AppBar position="static" className="mb-2">
+                    <Tabs orientation="horizontal" value={selectedTab} onChange={handleTabChange}>
+                      <Tab label="Exercises" />
+                      <Tab label="Nutritions" />
+                    </Tabs>
+                  </AppBar>
+                  {selectedTab === TABS.EXERCISES && <ExercisesList data={exercises} />}
+                  {selectedTab === TABS.NUTRITIONS && <NutritionsList data={nutritions} />}
+                </MDBox>
+              </div>
+            </Grid>
+          </DragDropContext>
           {/* <Grid item xs={12}>
             <MDBox pt={3}>
               <div className="flex items-center gap-8 py-2">

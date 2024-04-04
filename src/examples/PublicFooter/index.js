@@ -4,10 +4,13 @@ import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import typography from "assets/theme/base/typography";
+import { useLocation } from "react-router-dom";
 
 function PublicFooter({ company, links, className }) {
   const { href, name } = company;
   const { size } = typography;
+
+  const location = useLocation();
 
   return (
     <MDBox
@@ -15,7 +18,7 @@ function PublicFooter({ company, links, className }) {
       variant="gradient"
       bgColor="primary"
       coloredShadow="primary"
-      className="fixed bottom-0"
+      className={location.pathname === "/" ? "fixed bottom-0" : ""}
     >
       <div className="flex items-center justify-between container mx-auto h-[200px]">
         <MDBox

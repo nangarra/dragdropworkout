@@ -10,35 +10,27 @@ import { deleteExercise, getExercises } from "services/exercises";
 
 const Loader = () => (
   <>
-    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
+    <Grid item xs={12} sm={6} md={4} lg={3}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={200} />
     </Grid>
-    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
+    <Grid item xs={12} sm={6} md={4} lg={3}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={200} />
     </Grid>
-    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
-    </Grid>
-    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
-    </Grid>
-    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
-    </Grid>
-    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-      <Skeleton variant="rectangular" className="rounded-md w-full" height={180} />
+    <Grid item xs={12} sm={6} md={4} lg={3}>
+      <Skeleton variant="rectangular" className="rounded-md w-full" height={200} />
     </Grid>
   </>
 );
 
 const NoExercises = ({ onOpen }) => (
-  <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+  <Grid item xs={12} sm={4}>
     <Paper
       variant="outlined"
-      className="rounded-xl w-full h-[280px] p-4 flex flex-col items-center justify-center gap-4"
+      className="cursor-pointer hover:shadow-md relative overflow-hidden "
+      style={{ borderRadius: 8 }}
     >
       <div className="flex flex-col items-center justify-center gap-4 border border-gray-300 rounded-lg p-8">
-        <Typography>Add Exercises Now!</Typography>
+        <Typography variant="h4">Add Exercises Now!</Typography>
         <MDButton size="small" variant="gradient" color="primary" onClick={onOpen}>
           <Icon>add</Icon>&nbsp;Add New
         </MDButton>
@@ -119,7 +111,6 @@ const ExerciseList = (props) => {
               sm={6}
               md={4}
               lg={3}
-              xl={2}
               key={row.id}
               onMouseLeave={() => setHover(null)}
               onMouseEnter={() => setHover(row.id)}
@@ -134,16 +125,16 @@ const ExerciseList = (props) => {
                   className="cursor-pointer hover:shadow-md relative overflow-hidden"
                   style={{ borderRadius: 8 }}
                 >
-                  <div className="flex justify-center p-4 h-[140px] border-b border-gray-300">
+                  <div className="flex justify-center h-[160px] border-b border-gray-300">
                     <img
                       src={row.thumbnail || "/img/no-image.png"}
-                      className={`h-full w-fit ${row.thumbnail ? "" : "opacity-50"}`}
+                      className={`w-full object-cover ${row.thumbnail ? "" : "opacity-50"}`}
                     />
                   </div>
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: hover === row.id ? "auto" : 0 }}
-                    className="absolute top-0 right-0 grid w-full h-[139px] justify-end overflow-hidden z-50 bg-white"
+                    className="absolute top-0 right-0 grid w-full h-[159px] justify-end overflow-hidden z-50 bg-white"
                   >
                     <div className="flex flex-col items-center gap-2 p-2">
                       <Tooltip title="Edit" placement="right">

@@ -8,7 +8,7 @@ function BasicLayout({ image, children }) {
   return (
     <PageLayout>
       <Header />
-      <div className="flex flex-col gap-4" style={{ marginTop: 100, marginBottom: 200 }}>
+      <div className="flex flex-col gap-4" style={{ marginTop: 100, marginBottom: 20 }}>
         <Grid container justifyContent="center" alignItems="center" height="100%">
           {children}
         </Grid>
@@ -20,7 +20,6 @@ function BasicLayout({ image, children }) {
 
 // Typechecking props for the BasicLayout
 BasicLayout.propTypes = {
-  image: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
 };
 
