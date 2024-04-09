@@ -170,7 +170,17 @@ const ExerciseList = (props) => {
                       animate={{ height: hover === row.id ? "auto" : 0 }}
                       className="overflow-hidden"
                     >
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
                         {row.description}
                       </Typography>
                     </motion.div>
