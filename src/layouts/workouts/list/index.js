@@ -7,166 +7,71 @@ import dayjs from "dayjs";
 import DataTable from "examples/Tables/DataTable";
 import _ from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
 import StarRatings from "react-star-ratings";
+import { getWorkouts } from "services/workouts";
 
-const getWorkouts = async () => {
-  const data = [
-    {
-      title: "Best Biceps workout ever",
-      description: "Curl dumbbells with a slow squeeze to target your biceps for maximum growth.",
-      rating: 5,
-      exercises: 5,
-      createdAt: dayjs("02-03-2024").toDate(),
-    },
-    {
-      title: "Best Upper body chest workout ever",
-      description:
-        "Bench press variations to hit all areas of your chest for a well-rounded physique.",
-      rating: 4.5,
-      exercises: 7,
-      createdAt: dayjs("05-23-2024").toDate(),
-    },
-    {
-      title: "Thighs workout you would die for",
-      description:
-        "Compound squats and lunges to build strong, toned legs and a powerful lower body.",
-      rating: 4,
-      exercises: 6,
-      createdAt: dayjs("07-15-2024").toDate(),
-    },
-  ];
-  return { data };
+const Loader = ({ loading, children }) => {
+  if (loading) {
+    return (
+      <>
+        <div className="grid justify-center items-center absolute z-30 top-0 right-0 left-0 bottom-0 w-full h-full">
+          <div className="loader-lg"></div>
+        </div>
+        {children}
+      </>
+    );
+  }
+
+  return <>{children}</>;
 };
 
-const Loader = () => (
-  <MDBox pt={3}>
-    <div className="flex flex-col gap-4 p-4">
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-    </div>
-  </MDBox>
-);
-
-const WorkoutList = (props) => {
-  const { getData } = props;
+const WorkoutList = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("popular");
 
   useEffect(() => {
     getWorkoutsData();
-  }, []);
-
-  useEffect(() => {
-    if (getData) {
-      getWorkoutsData();
-    }
-  }, [getData]);
+  }, [filter]);
 
   const getWorkoutsData = async () => {
     setLoading(true);
-    const response = await getWorkouts();
+    const response = await getWorkouts({ sort: filter });
     const data = setData(response.data);
-    setWorkouts(_.orderBy(data, ["rating"], ["desc"]));
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    setWorkouts(data);
+    setLoading(false);
   };
 
   const changeFilter = (value) => {
     setFilter(value);
-    switch (value) {
-      case "popular": {
-        setWorkouts(_.orderBy(workouts, ["rating"], ["desc"]));
-        break;
-      }
-      case "recent": {
-        setWorkouts(_.orderBy(workouts, ["createdAt"], ["desc"]));
-        break;
-      }
-      case "old": {
-        setWorkouts(_.orderBy(workouts, ["createdAt"], ["asc"]));
-        break;
-      }
-      default: {
-        setWorkouts(_.orderBy(workouts, ["rating"], ["desc"]));
-        break;
-      }
-    }
   };
 
   const setData = (data = []) => {
     return _.map(data, (row) => ({
       ...row,
       title: (
-        <MDTypography display="block" variant="button" fontWeight="medium" lineHeight={1}>
-          {row.title}
-        </MDTypography>
+        <NavLink to={`/workouts/${row.id}`}>
+          <b>{row.title}</b>
+        </NavLink>
       ),
       description: <MDTypography variant="caption">{row.description}</MDTypography>,
       exercises: (
         <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-          {row.exercises}
+          {row.SelectedExercise?.length}
         </MDTypography>
       ),
       ratingHtml: (
         <StarRatings
           starDimension="20px"
           starSpacing="2px"
-          rating={row.rating}
+          rating={Number(row.rating || 0)}
           starRatedColor="gold"
           numberOfStars={5}
           name="rating"
         />
       ),
       createdAt: dayjs(row.createdAt).format("MM/DD/YYYY"),
-      action: (
-        <MDTypography
-          component="a"
-          href="#"
-          color="text"
-          className="text-gray-400 hover:text-red-400"
-        >
-          <Icon>delete_forever</Icon>
-        </MDTypography>
-      ),
     }));
   };
 
@@ -176,7 +81,6 @@ const WorkoutList = (props) => {
     { Header: "total exercises", accessor: "exercises", align: "left" },
     { Header: "rating", accessor: "ratingHtml", align: "left" },
     { Header: "created", accessor: "createdAt", align: "left" },
-    { Header: "action", accessor: "action", align: "left" },
   ];
 
   const columnHeaders = _.map(cols, "Header");
@@ -237,19 +141,21 @@ const WorkoutList = (props) => {
           </Grid>
         </MDBox>
       </Card>
-      <Card>
-        <Loading loading={loading} customLoader={<Loader />}>
-          <MDBox>
-            <DataTable
-              table={{ columns, rows: workouts }}
-              isSorted={false}
-              entriesPerPage={{ defaultValue: 10, entries: [10, 25, 50, 100] }}
-              showTotalEntries
-              noEndBorder
-            />
-          </MDBox>
-        </Loading>
-      </Card>
+      <div className="min-h-[700px]">
+        <Card>
+          <Loader loading={loading}>
+            <MDBox>
+              <DataTable
+                table={{ columns, rows: workouts }}
+                isSorted={false}
+                entriesPerPage={{ defaultValue: 10, entries: [10, 25, 50, 100] }}
+                showTotalEntries
+                noEndBorder
+              />
+            </MDBox>
+          </Loader>
+        </Card>
+      </div>
     </div>
   );
 };

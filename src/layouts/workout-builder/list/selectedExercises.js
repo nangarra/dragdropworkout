@@ -1,6 +1,7 @@
-import { Paper, Typography } from "@mui/material";
+import { Icon, Paper, Tooltip, Typography } from "@mui/material";
+import { motion } from "framer-motion";
 import _ from "lodash";
-import React from "react";
+import React, { useState } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 
 const BG = [
@@ -15,115 +16,28 @@ const BG = [
   { label: "9" },
 ];
 
-const dummy = [
-  {
-    id: "qelqjwelk-qjwlekjqw-lekjq-wke",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqjwelk-qjwlekjqw-lekdasdjq-wke",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqjwelk-qjwlekjqw-lekjq-wkeadasd",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqjwelk-qjwlekjqw-lekjq-wkeasddd",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqjwelk-qjwasdaslekjqw-lekjq-wke",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqasdasdjwelk-qjwlekjqw-lekjq-wke",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqjwelk-qjwlekjqw-lekddasjq-wke",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqfffggjwelk-qjwlekjqw-lekjq-wke",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-  {
-    id: "qelqjwelk-qjwlekjqw-lgggekjq-wke",
-    title: "SMOOTHIE",
-    calories: 15,
-    fat: 0,
-    protein: 11,
-    pcs: 1,
-    thumbnail:
-      "https://www.eatingwell.com/thmb/KCDDSEVOd4pRYoDokPJ4cUuwLxI=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EWL-57793-berry-kefir-smoothie-Hero-01-A-ae9e20c50f1843928b81c102bfa80b4c.jpg",
-  },
-];
+const TYPES = {
+  EXERCISES: "exercises",
+  NUTRITIONS: "nutritions",
+};
 
 const SelectedExercises = (props) => {
-  const { data = [], hoveredPlace } = props;
+  const { data = [], hoveredPlace, dragging, editItem, removeItem, error } = props;
+  const [hoverItem, setHoverItem] = useState(null);
 
   const selected =
     data.length < 9 ? [...data, ...Array(9 - data.length).fill({ dummy: true })] : data;
 
   return (
-    <div className="grid grid-cols-3 gap-8 w-full min-h-[900px] relative">
-      <div className="col-span-3 w-full h-full absolute grid grid-cols-3 gap-4 top-0 bottom-0 left-0 right-0 z-10">
+    <div className="grid grid-cols-3 gap-8 w-full min-h-[750px] relative">
+      <div className="col-span-3 w-full h-full absolute grid grid-cols-3 gap-8 top-0 bottom-0 left-0 right-0 z-10">
         {BG.map((bg) => (
           <div
             key={bg.label}
-            className="grid items-center justify-center rounded-lg text-[120px] h-[300px]"
+            className="grid items-center justify-center rounded-lg text-[150px] h-[250px]"
           >
             <b
-              className={`${
+              className={`${error === "selected" && "text-red-400"} ${
                 String(hoveredPlace) === bg.label ? "text-indigo-700/60" : "text-gray-100"
               } transition duration-300 ease-in-out`}
             >
@@ -140,7 +54,11 @@ const SelectedExercises = (props) => {
               <ul
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="flex flex-col gap-2 z-20 relative"
+                className={`${
+                  hoverItem === row.id ? "shadow-md rounded-lg" : ""
+                } transition duration-300 ease-in-out flex flex-col gap-2 z-20 relative overflow-hidden`}
+                onMouseEnter={() => setHoverItem(row.id)}
+                onMouseLeave={() => setHoverItem(null)}
               >
                 <Draggable draggableId={row.id} index={index}>
                   {(provided) => (
@@ -148,12 +66,36 @@ const SelectedExercises = (props) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      style={{ ...provided.draggableProps.style, transition: "none" }}
+                      style={{ ...provided.draggableProps.style }}
                     >
-                      <div className="flex justify-center h-[200px] rounded-lg overflow-hidden cursor-drag">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: hoverItem === row.id && !dragging ? "auto" : 0 }}
+                        className="absolute top-0 right-0 grid w-full h-[159px] justify-end overflow-hidden z-50 bg-white"
+                      >
+                        <div className="flex flex-col items-center gap-2 p-2">
+                          <Tooltip title="Remove" placement="right">
+                            <Icon
+                              onClick={() => removeItem(row.id)}
+                              className="text-gray-400 hover:text-red-400 cursor-pointer font-bold"
+                            >
+                              close
+                            </Icon>
+                          </Tooltip>
+                          <Tooltip title="Edit" placement="right">
+                            <Icon
+                              onClick={() => editItem(row)}
+                              className="text-gray-400 hover:text-blue-400 cursor-pointer"
+                            >
+                              edit
+                            </Icon>
+                          </Tooltip>
+                        </div>
+                      </motion.div>
+                      <div className="flex justify-center h-[150px] rounded-lg overflow-hidden cursor-drag">
                         <img
                           src={row.thumbnail || "/img/no-image.png"}
-                          className={`w-full object-cover ${row.thumbnail ? "" : "opacity-50"}`}
+                          className={`w-1/2 object-cover ${row.thumbnail ? "" : "opacity-50"}`}
                         />
                       </div>
                       <Typography
@@ -163,24 +105,80 @@ const SelectedExercises = (props) => {
                       >
                         <span>{row.title}</span>
                       </Typography>
-                      <div className="grid grid-cols-2 text-xs justify-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <b className="text-lg">{row.calories || "--"}</b> <span>g</span>{" "}
-                          <span>Calories</span>
+                      {row.type === TYPES.EXERCISES && (
+                        <div className="grid grid-cols-2 text-xs justify-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <b className="text-lg">
+                              {row.sets
+                                ? Number(row.sets).toLocaleString("en-US", {
+                                    minimumIntegerDigits: 2,
+                                  })
+                                : "--"}
+                            </b>
+                            <span>Sets</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <b className="text-lg">
+                              {row.repititions
+                                ? Number(row.repititions).toLocaleString("en-US", {
+                                    minimumIntegerDigits: 2,
+                                  })
+                                : "--"}
+                            </b>
+                            <span>Reps</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="flex items-center">
+                              <b className="text-lg">
+                                {row.minutes
+                                  ? Number(row.minutes).toLocaleString("en-US", {
+                                      minimumIntegerDigits: 2,
+                                    })
+                                  : "00"}
+                              </b>
+                              <h5>:</h5>&nbsp;
+                              <b className="text-lg">
+                                {row.seconds
+                                  ? Number(row.seconds).toLocaleString("en-US", {
+                                      minimumIntegerDigits: 2,
+                                    })
+                                  : "00"}
+                              </b>
+                            </span>
+                            <span>Rest</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <b className="text-lg">
+                              {row.weight
+                                ? Number(row.weight).toLocaleString("en-US", {
+                                    minimumIntegerDigits: 2,
+                                  })
+                                : "--"}
+                            </b>
+                            <span>KG</span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-center gap-2">
-                          <b className="text-lg">{row.fat || "--"}</b> <span>g</span>{" "}
-                          <span>Fat</span>
+                      )}
+                      {row.type === TYPES.NUTRITIONS && (
+                        <div className="grid grid-cols-2 text-xs justify-center">
+                          <div className="flex items-center justify-center gap-2">
+                            <b className="text-lg">{row.calories || "--"}</b> <span>g</span>{" "}
+                            <span>Calories</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <b className="text-lg">{row.fat || "--"}</b> <span>g</span>{" "}
+                            <span>Fat</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <b className="text-lg">{row.protein || "--"}</b> <span>g</span>{" "}
+                            <span>Protein</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2">
+                            <b className="text-lg">{row.pcs || "--"}</b> <span>g</span>{" "}
+                            <span>pcs</span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-center gap-2">
-                          <b className="text-lg">{row.protein || "--"}</b> <span>g</span>{" "}
-                          <span>Protein</span>
-                        </div>
-                        <div className="flex items-center justify-center gap-2">
-                          <b className="text-lg">{row.pcs || "--"}</b> <span>g</span>{" "}
-                          <span>pcs</span>
-                        </div>
-                      </div>
+                      )}
                     </li>
                   )}
                 </Draggable>
@@ -193,7 +191,7 @@ const SelectedExercises = (props) => {
               <ul
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="flex flex-col gap-2 z-20 relative"
+                className="flex flex-col gap-2 z-20 relative h-[250px]"
               ></ul>
             )}
           </Droppable>

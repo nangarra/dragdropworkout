@@ -129,7 +129,7 @@ const NutritionList = (props) => {
                   <div className="flex justify-center h-[160px] border-b border-gray-300">
                     <img
                       src={row.thumbnail || "/img/no-image.png"}
-                      className={`w-full object-cover ${row.thumbnail ? "" : "opacity-50"}`}
+                      className={`w-1/2 object-cover ${row.thumbnail ? "" : "opacity-50"}`}
                     />
                   </div>
                   <motion.div

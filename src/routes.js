@@ -118,6 +118,14 @@ const publicRoutes = [
   },
   {
     type: "collapse",
+    name: "Workout",
+    key: "workout",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/workouts/:id",
+    component: lazy(() => import("layouts/created-workouts/index.js")),
+  },
+  {
+    type: "collapse",
     name: "Workout Builder",
     key: "workout-builder",
     icon: <Icon fontSize="small">login</Icon>,

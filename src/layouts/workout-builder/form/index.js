@@ -1,186 +1,164 @@
-import {
-  Drawer,
-  FormControl,
-  FormHelperText,
-  Icon,
-  IconButton,
-  TextField,
-  Typography,
-} from "@mui/material";
-import MDBox from "components/MDBox";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import PropTypes from "prop-types";
 import MDButton from "components/MDButton";
+import { Input } from "@mui/material";
 import MDInput from "components/MDInput";
-import Loading from "components/MDLoader";
-import Notification from "components/Notification";
-import { setToast, useMaterialUIController } from "context";
-import { navbarIconButton } from "examples/Navbars/DashboardNavbar/styles";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { saveExercise } from "services/exercises";
 
-const style = { width: 600 };
-
-const DEFAULT_VALUES = { title: null, description: null, thumbnail: null };
-
-const ExerciseForm = (props) => {
-  const { open, onClose, exercise = {} } = props;
-  const [, dispatch] = useMaterialUIController();
-  const [errors, setError] = useState({ title: null });
-  const [hover, setHover] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [values, setValues] = useState({});
-  const { workoutId } = useParams();
+const EditForm = (props) => {
+  const { onClose, open, data = {}, onSubmit } = props;
+  const [value, setValue] = useState({});
 
   useEffect(() => {
-    setValues(exercise.id ? exercise : DEFAULT_VALUES);
-  }, [open]);
+    if (data.id) {
+      setValue(data);
+    } else {
+      setTimeout(() => {
+        setValue(data);
+      }, 1000);
+    }
+  }, [data]);
 
-  const handleChange = (e) => {
-    const { value, name } = e.target;
-    setValues((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setError((prev) => ({
-      ...prev,
-      [name]: !value,
-    }));
+  const handleExerciseChange = (event) => {
+    const newValue = event.target.value.replace(/[^0-9]/g, "");
+    if (event.target.name === "minutes" || event.target.name === "seconds") {
+      if (newValue >= 60) return;
+      setValue((prev) => ({ ...prev, [event.target.name]: +newValue }));
+      return;
+    }
+
+    if (event.target.name === "weight") {
+      if (newValue > 999) return;
+      setValue((prev) => ({ ...prev, [event.target.name]: +newValue }));
+      return;
+    }
+
+    if (newValue <= 99) {
+      setValue((prev) => ({ ...prev, [event.target.name]: +newValue }));
+    }
+  };
+
+  const handleNutritionChange = (event) => {
+    const newValue = event.target.value.replace(/[^0-9]/g, "");
+    if (newValue > 999) return;
+    setValue((prev) => ({ ...prev, [event.target.name]: +newValue }));
+    return;
   };
 
   const handleClose = () => {
-    setValues(DEFAULT_VALUES);
     onClose();
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!values.title) {
-      setError((prev) => ({ ...prev, title: true }));
-      return;
-    }
-    setLoading(true);
-    try {
-      values.workoutId = workoutId;
-      const response = await saveExercise(values);
-      setToast(
-        dispatch,
-        <Notification type="success" title="Success!" content="Exercise created!" />
-      );
-      handleClose();
-    } catch (error) {
-      setToast(
-        dispatch,
-        <Notification type="error" title="Something went wrong!" content={error?.message} />
-      );
-    }
-    setLoading(false);
-  };
-
-  const onFileUpload = (event) => {
-    const file = event.target.files[0];
-    const { name } = event.target;
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-
-    reader.onload = () => {
-      setValues((prev) => ({
-        ...prev,
-        [name]: reader.result,
-      }));
-    };
-
-    reader.onerror = (error) => {
-      console.error("Error converting file to base64:", error);
-    };
-  };
-
-  const Header = () => (
-    <Typography variant="h4" className="flex justify-between p-4 border-b">
-      {exercise?.id ? "Edit" : "Add"} New Exercise
-      <IconButton size="small" color="inherit" sx={navbarIconButton} onClick={onClose}>
-        <Icon>clear</Icon>
-      </IconButton>
-    </Typography>
-  );
-
   return (
-    <Drawer open={open} anchor="right" PaperProps={{ style }}>
-      <Loading loading={loading} />
-      <form className="flex flex-col justify-between h-full" onSubmit={handleSubmit}>
-        <Header />
-        <MDBox className="flex flex-col justify-start h-full overflow-y-auto p-4 gap-4">
-          <FormControl fullWidth required error={errors.title}>
-            <MDBox>
-              <MDInput
-                fullWidth
-                type="text"
-                name="title"
-                label="Title"
-                value={values.title}
-                onChange={handleChange}
-                error={errors.title}
-              />
-              {errors.title && <FormHelperText>Title is required</FormHelperText>}
-            </MDBox>
-          </FormControl>
-
-          <FormControl fullWidth>
-            <TextField
-              label="Description"
-              multiline
-              rows={4}
-              name="description"
-              onChange={handleChange}
-              value={values.description}
-            />
-          </FormControl>
-
-          <FormControl>
-            <MDButton variant="gradient" color="primary" component="label" htmlFor="upload-file">
-              <Icon>upload</Icon>&nbsp;Upload Thumbnail{" "}
+    <Dialog onClose={handleClose} open={open}>
+      <DialogTitle>{String(value.title).toUpperCase()}</DialogTitle>
+      <DialogContent>
+        {value.description && <DialogContentText>{value.description}</DialogContentText>}
+        {value.type === "exercises" ? (
+          <div className="grid grid-cols-2 justify-center gap-8 p-4 text-[20px]">
+            <div className="flex items-center gap-2">
               <input
-                hidden
-                id="upload-file"
-                name="thumbnail"
-                accept="image/*"
-                type="file"
-                onChange={onFileUpload}
+                name="sets"
+                value={value.sets}
+                onChange={handleExerciseChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
               />
-            </MDButton>
-          </FormControl>
-          {values.thumbnail && (
-            <div
-              onMouseEnter={() => setHover(true)}
-              onMouseLeave={() => setHover(false)}
-              className="grid justify-center items-center rounded-lg border border-gray-300 h-[200px] w-[200px] relative overflow-hidden"
-            >
-              {hover && (
-                <div className="absolute bg-black/30 w-full h-full">
-                  <IconButton size="small" color="inherit" sx={navbarIconButton}>
-                    <Icon onClick={() => setValues((prev) => ({ ...prev, thumbnail: null }))}>
-                      clear
-                    </Icon>
-                  </IconButton>
-                </div>
-              )}
-
-              <img src={values.thumbnail} className="w-fit h-full" />
+              <span>Sets</span>
             </div>
-          )}
-        </MDBox>
-        <div className="flex justify-start items-center p-4 border-t text-white gap-2">
-          <MDButton size="small" variant="gradient" color="primary" type="submit">
-            <Icon>save</Icon>&nbsp;Save
-          </MDButton>
-          <MDButton size="small" variant="contained" color="white" type="button" onClick={onClose}>
-            Cancel
-          </MDButton>
-        </div>
-      </form>
-    </Drawer>
+            <div className="flex items-center gap-2">
+              <input
+                name="repititions"
+                value={value.repititions}
+                onChange={handleExerciseChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <span>Reps</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                placeholder="00"
+                name="minutes"
+                value={value.minutes}
+                onChange={handleExerciseChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <input
+                placeholder="00"
+                name="seconds"
+                value={value.seconds}
+                onChange={handleExerciseChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <span>Rest</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                name="weight"
+                value={value.weight}
+                onChange={handleExerciseChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <span>KG</span>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 justify-center gap-8 p-4 text-[20px]">
+            <div className="flex items-center gap-2">
+              <input
+                name="calories"
+                value={value.calories}
+                onChange={handleNutritionChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <span>g</span> <span>Calories</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                name="fat"
+                value={value.fat}
+                onChange={handleNutritionChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <span>g</span> <span>Fat</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                name="protein"
+                value={value.protein}
+                onChange={handleNutritionChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <span>g</span> <span>Protein</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                name="pcs"
+                value={value.pcs}
+                onChange={handleNutritionChange}
+                className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
+              />
+              <span>g</span> <span>pcs</span>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <MDButton variant="gradient" color="primary" onClick={() => onSubmit(value)}>
+          Done
+        </MDButton>
+      </DialogActions>
+    </Dialog>
   );
 };
 
-export default ExerciseForm;
+EditForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  selectedValue: PropTypes.string.isRequired,
+};
+
+export default EditForm;

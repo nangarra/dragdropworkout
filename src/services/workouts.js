@@ -9,9 +9,23 @@ export async function getWorkouts(options = {}) {
   });
 }
 
-export async function saveWorkout(data) {
+export async function getWorkout(workoutId) {
   return ApiService.fetchData({
-    url: `${PRIFIX}/save`,
+    url: `${PRIFIX}/get-one/${workoutId}`,
+    method: "get",
+  });
+}
+
+export async function setWorkoutRating(workoutId, rating) {
+  return ApiService.fetchData({
+    url: `${PRIFIX}/set-rating/${workoutId}/${rating}`,
+    method: "post",
+  });
+}
+
+export async function createWorkout(data) {
+  return ApiService.fetchData({
+    url: `${PRIFIX}/create`,
     method: "post",
     data,
   });

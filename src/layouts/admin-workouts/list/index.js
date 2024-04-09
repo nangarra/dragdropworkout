@@ -1,4 +1,5 @@
-import { Card, Grid, Icon, Input, Skeleton } from "@mui/material";
+import { Card, Grid, Icon, Input, Skeleton, Tooltip } from "@mui/material";
+import Confirmation from "components/Confirmation";
 import Loading from "components/Loading";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
@@ -8,149 +9,84 @@ import DataTable from "examples/Tables/DataTable";
 import _ from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import StarRatings from "react-star-ratings";
+import { deleteWorkout } from "services/workouts";
+import { getWorkouts } from "services/workouts";
 
-const getWorkouts = async () => {
-  const data = [
-    {
-      title: "Best Biceps workout ever",
-      description: "Curl dumbbells with a slow squeeze to target your biceps for maximum growth.",
-      rating: 5,
-      exercises: 5,
-      createdAt: dayjs("02-03-2024").toDate(),
-    },
-    {
-      title: "Best Upper body chest workout ever",
-      description:
-        "Bench press variations to hit all areas of your chest for a well-rounded physique.",
-      rating: 4.5,
-      exercises: 7,
-      createdAt: dayjs("05-23-2024").toDate(),
-    },
-    {
-      title: "Thighs workout you would die for",
-      description:
-        "Compound squats and lunges to build strong, toned legs and a powerful lower body.",
-      rating: 4,
-      exercises: 6,
-      createdAt: dayjs("07-15-2024").toDate(),
-    },
-  ];
-  return { data };
+const Loader = ({ loading, children }) => {
+  if (loading) {
+    return (
+      <>
+        <div className="grid justify-center items-center absolute z-30 top-0 right-0 left-0 bottom-0 w-full h-full">
+          <div className="loader-lg"></div>
+        </div>
+        {children}
+      </>
+    );
+  }
+
+  return <>{children}</>;
 };
 
-const Loader = () => (
-  <MDBox pt={3}>
-    <div className="flex flex-col gap-4 p-4">
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-      <hr className="w-full" />
-      <div className="grid grid-cols-6 gap-4">
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full col-span-2" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-        <Skeleton variant="rectangular" className="rounded-md w-full" height={30} />
-      </div>
-    </div>
-  </MDBox>
-);
-
-const WorkoutList = (props) => {
-  const { getData } = props;
+const WorkoutList = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [confirm, setConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteWorkoutId, setDeleteWorkoutId] = useState(null);
   const [filter, setFilter] = useState("popular");
 
   useEffect(() => {
     getWorkoutsData();
-  }, []);
-
-  useEffect(() => {
-    if (getData) {
-      getWorkoutsData();
-    }
-  }, [getData]);
+  }, [filter]);
 
   const getWorkoutsData = async () => {
     setLoading(true);
-    const response = await getWorkouts();
+    const response = await getWorkouts({ sort: filter });
     const data = setData(response.data);
-    setWorkouts(_.orderBy(data, ["rating"], ["desc"]));
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    setWorkouts(data);
+    setLoading(false);
   };
 
   const changeFilter = (value) => {
     setFilter(value);
-    switch (value) {
-      case "popular": {
-        setWorkouts(_.orderBy(workouts, ["rating"], ["desc"]));
-        break;
-      }
-      case "recent": {
-        setWorkouts(_.orderBy(workouts, ["createdAt"], ["desc"]));
-        break;
-      }
-      case "old": {
-        setWorkouts(_.orderBy(workouts, ["createdAt"], ["asc"]));
-        break;
-      }
-      default: {
-        setWorkouts(_.orderBy(workouts, ["rating"], ["desc"]));
-        break;
-      }
-    }
+  };
+
+  const closeConfirmDeleteWorkout = () => {
+    setConfirm(false);
+    setDeleteWorkoutId(null);
+  };
+  const confirmDeleteWorkout = (id) => {
+    setConfirm(true);
+    setDeleteWorkoutId(id);
+  };
+
+  const deleteWorkoutConfirmed = async () => {
+    setDeleting(true);
+    const response = await deleteWorkout(deleteWorkoutId);
+    setDeleting(false);
+    closeConfirmDeleteWorkout();
+    getWorkoutsData();
   };
 
   const setData = (data = []) => {
     return _.map(data, (row) => ({
       ...row,
       title: (
-        <MDTypography display="block" variant="button" fontWeight="medium" lineHeight={1}>
-          {row.title}
-        </MDTypography>
+        <a href={`/workouts/${row.id}`} target="_blank">
+          <b>{row.title}</b>
+        </a>
       ),
       description: <MDTypography variant="caption">{row.description}</MDTypography>,
       exercises: (
         <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
-          {row.exercises}
+          {row.SelectedExercise?.length}
         </MDTypography>
       ),
       ratingHtml: (
         <StarRatings
           starDimension="20px"
           starSpacing="2px"
-          rating={row.rating}
+          rating={Number(row.rating || 0)}
           starRatedColor="gold"
           numberOfStars={5}
           name="rating"
@@ -158,14 +94,17 @@ const WorkoutList = (props) => {
       ),
       createdAt: dayjs(row.createdAt).format("MM/DD/YYYY"),
       action: (
-        <MDTypography
-          component="a"
-          href="#"
-          color="text"
-          className="text-gray-400 hover:text-red-400"
-        >
-          <Icon>delete_forever</Icon>
-        </MDTypography>
+        <Tooltip title="Delete" placement="right">
+          <MDTypography
+            component="a"
+            href="#"
+            color="text"
+            className="text-gray-400 hover:text-red-400"
+            onClick={() => confirmDeleteWorkout(row.id)}
+          >
+            <Icon>delete_outline</Icon>
+          </MDTypography>
+        </Tooltip>
       ),
     }));
   };
@@ -184,6 +123,14 @@ const WorkoutList = (props) => {
 
   return (
     <MDBox pt={4} pb={3}>
+      <Confirmation
+        loading={deleting}
+        open={confirm}
+        title="Delete Workout"
+        message="Are you sure you want to delete this workout?"
+        onClose={closeConfirmDeleteWorkout}
+        onConfirm={deleteWorkoutConfirmed}
+      />
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Card>
@@ -241,8 +188,8 @@ const WorkoutList = (props) => {
           </Card>
         </Grid>
         <Grid item xs={12}>
-          <Card>
-            <Loading loading={loading} customLoader={<Loader />}>
+          <Card className="relative overflow-hidden">
+            <Loader loading={loading}>
               <MDBox>
                 <DataTable
                   table={{ columns, rows: workouts }}
@@ -252,7 +199,7 @@ const WorkoutList = (props) => {
                   noEndBorder
                 />
               </MDBox>
-            </Loading>
+            </Loader>
           </Card>
         </Grid>
       </Grid>
