@@ -6,6 +6,7 @@ import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 import dayjs from "dayjs";
 import DataTable from "examples/Tables/DataTable";
+import { useTitleCase } from "hooks";
 import _ from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
 import StarRatings from "react-star-ratings";
@@ -72,7 +73,7 @@ const WorkoutList = () => {
     return _.map(data, (row) => ({
       ...row,
       title: (
-        <a href={`/workouts/${row.id}`} target="_blank">
+        <a href={`/workouts/${useTitleCase(row.title)}`} target="_blank">
           <b>{row.title}</b>
         </a>
       ),

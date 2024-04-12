@@ -26,6 +26,7 @@ import NutritionsList from "./list/nutritions";
 import SelectedExercises from "./list/selectedExercises";
 import { createWorkout } from "services/workouts";
 import { useNavigate } from "react-router-dom";
+import { useTitleCase } from "hooks";
 
 const INITIAL_STATE = {
   title: null,
@@ -149,8 +150,13 @@ const WorkoutBuilder = () => {
     try {
       workout.selected = selected;
       const response = await createWorkout(workout);
-      navigate(`/workouts/${response.data.id}`);
+      navigate(`/workouts/${useTitleCase(response.data.title)}`);
     } catch (error) {
+      if (error?.response?.data?.message === "501") {
+        setError("unique-title");
+        setLoading(false);
+        return;
+      }
       setToast(
         dispatch,
         <Notification
@@ -346,6 +352,11 @@ const WorkoutBuilder = () => {
                             <Typography variant="h3">{workout.title || "Workout Title"}</Typography>
                             {error === "title" && (
                               <div className="text-red-400 text-sm">Title is required!</div>
+                            )}
+                            {error === "unique-title" && (
+                              <div className="text-red-400 text-sm">
+                                Workout already exists. Please enter a unique title.
+                              </div>
                             )}
                           </div>
                         )}

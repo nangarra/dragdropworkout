@@ -1,12 +1,12 @@
-import { Card, Grid, Icon, Input, Skeleton } from "@mui/material";
-import Loading from "components/Loading";
+import { Card, Grid } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 import dayjs from "dayjs";
 import DataTable from "examples/Tables/DataTable";
+import { useTitleCase } from "hooks";
 import _ from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import StarRatings from "react-star-ratings";
 import { getWorkouts } from "services/workouts";
@@ -51,7 +51,7 @@ const WorkoutList = () => {
     return _.map(data, (row) => ({
       ...row,
       title: (
-        <NavLink to={`/workouts/${row.id}`}>
+        <NavLink to={`/workouts/${useTitleCase(row.title)}`}>
           <b>{row.title}</b>
         </NavLink>
       ),

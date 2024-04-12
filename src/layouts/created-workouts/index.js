@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Icon,
   IconButton,
@@ -32,7 +31,7 @@ const CreatedWorkouts = () => {
   const [rating, setRating] = useState(0);
   const [confirming, setConfirming] = useState(false);
 
-  const { id: workoutId } = useParams();
+  const { workout: workoutId } = useParams();
 
   useEffect(() => {
     if (workoutId) {
