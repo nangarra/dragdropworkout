@@ -31,7 +31,11 @@ const ExercisesList = (props) => {
         {(provided) => (
           <ul {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-2">
             {evens.map((row, index) => (
-              <Draggable key={row.id} draggableId={row.id} index={index}>
+              <Draggable
+                index={index}
+                key={`exercises:${row.id}`}
+                draggableId={`exercises:${row.id}`}
+              >
                 {(provided) => (
                   <li
                     ref={provided.innerRef}
@@ -96,7 +100,11 @@ const ExercisesList = (props) => {
         {(provided) => (
           <ul {...provided.droppableProps} ref={provided.innerRef} className="flex flex-col gap-2">
             {odds.map((row, index) => (
-              <Draggable key={row.id} draggableId={row.id} index={index}>
+              <Draggable
+                index={index}
+                key={`exercises:${row.id}`}
+                draggableId={`exercises:${row.id}`}
+              >
                 {(provided) => (
                   <li
                     ref={provided.innerRef}

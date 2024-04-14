@@ -1,8 +1,5 @@
 import PropTypes from "prop-types";
-import Link from "@mui/material/Link";
-import Icon from "@mui/material/Icon";
 import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
 import typography from "assets/theme/base/typography";
 import { useLocation } from "react-router-dom";
 
@@ -29,19 +26,18 @@ function PublicFooter({ company, links, className }) {
           color="white"
           fontSize={size.sm}
         >
-          &copy; {new Date().getFullYear()}, made with
-          <MDBox fontSize={size.md} color="white" mb={-0.5} mx={0.25}>
-            <Icon color="inherit" fontSize="inherit">
-              favorite
-            </Icon>
-          </MDBox>
-          by
-          <Link target="_blank">
-            <MDTypography variant="button" fontWeight="medium">
-              &nbsp;Nick&nbsp;
-            </MDTypography>
-          </Link>
-          for a better web.
+          DragDropWorkout: Your free workout planner that simplifies planning and executing workouts
+          within minutes.
+        </MDBox>
+        <MDBox
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          flexWrap="wrap"
+          color="white"
+          fontSize={size.sm}
+        >
+          Copyright © Nangarra Inc {new Date().getFullYear()}.
         </MDBox>
       </div>
     </MDBox>

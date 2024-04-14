@@ -77,14 +77,14 @@ const CreatedWorkouts = () => {
     }
   };
 
-  const onConfirmRating = async () => {
+  const onConfirmRating = async (value) => {
     setConfirming(true);
-    const response = await setWorkoutRating(workoutId, rating);
+    const response = await setWorkoutRating(workout.id, value);
     let myRatings = JSON.parse(localStorage.getItem(MY_WORKOUT_RATINGS));
     if (!myRatings) {
       myRatings = {};
     }
-    myRatings[workoutId] = rating;
+    myRatings[workoutId] = value;
     localStorage.setItem(MY_WORKOUT_RATINGS, JSON.stringify(myRatings));
     setOpen(false);
     setConfirming(false);
@@ -93,11 +93,12 @@ const CreatedWorkouts = () => {
 
   const changeRating = (value) => {
     setRating(value);
+    onConfirmRating(value);
   };
 
   return (
     <BasicLayout>
-      <Dialog
+      {/* <Dialog
         fullScreen={false}
         open={open}
         onClose={onClose}
@@ -126,7 +127,7 @@ const CreatedWorkouts = () => {
             {confirming && <CircularProgress size={10} color="white" />}&nbsp;Confirm
           </MDButton>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
       <Loading loading={loading} customLoader={<Loader />}>
         <div className="flex flex-col gap-8 p-2">
           <div className="flex flex-col">
@@ -139,20 +140,19 @@ const CreatedWorkouts = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center bg-[#7560C5] rounded-lg text-white p-2 text-xs"
+                      className="flex items-center bg-[#7560C5] rounded-lg text-white p-2 text-xs min-w-[125px]"
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
                       {message}
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <Tooltip title="Copy">
-                  <div className="border rounded-full border-[#7560C5] bg-white">
-                    <IconButton color="primary" aria-label="Add" onClick={copyToClipboard}>
-                      <Icon fontSize="small">copy</Icon>
-                    </IconButton>
-                  </div>
-                </Tooltip>
+                <div className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer">
+                  <IconButton color="primary" aria-label="Add" onClick={copyToClipboard}>
+                    <Icon fontSize="small">copy</Icon>
+                    <b className="text-sm">Copy URL</b>
+                  </IconButton>
+                </div>
               </div>
             </div>
             <div className="flex justify-between items-center">
@@ -170,20 +170,29 @@ const CreatedWorkouts = () => {
                   rating ? "gap-2" : "gap-1"
                 )}
               >
-                <span className="flex items-center h-full text-[20px]">
+                <span className="flex items-center h-full text-[20px] gap-2">
                   {rating ? (
-                    <div className="flex items-center h-full gap-1">
-                      <span className="flex items-center h-full text-[20px]">
-                        <Icon>star</Icon>
-                      </span>
-                      <h3>{Number(rating)}/5</h3>
-                    </div>
+                    <>
+                      <div className="flex items-center h-full gap-1">
+                        <span className="flex items-center h-full text-[20px] pb-1">
+                          <Icon>star</Icon>
+                        </span>
+                        <h3>{Number(rating)}/5</h3>
+                      </div>
+                      <span className="text-sm">Your Rating</span>
+                    </>
                   ) : (
-                    <Icon>star_border</Icon>
+                    <StarRatings
+                      rating={rating}
+                      changeRating={changeRating}
+                      starDimension="30px"
+                      starSpacing="2px"
+                      starRatedColor="gold"
+                      starHoverColor="#7560C5"
+                      numberOfStars={5}
+                      name="rating"
+                    />
                   )}
-                </span>
-                <span className="flex items-center h-full" onClick={onOpen}>
-                  Your Rating
                 </span>
               </div>
             </div>

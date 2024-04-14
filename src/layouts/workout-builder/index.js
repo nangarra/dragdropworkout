@@ -7,26 +7,24 @@ import {
   InputAdornment,
   Tab,
   Tabs,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import MDBox from "components/MDBox";
-import MDButton from "components/MDButton";
 import Notification from "components/Notification";
 import { setToast, useMaterialUIController } from "context";
+import { useTitleCase } from "hooks";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
+import { useNavigate } from "react-router-dom";
 import { getExercises } from "services/exercises";
 import { getNutritions } from "services/nutritions";
+import { createWorkout } from "services/workouts";
 import EditForm from "./form";
 import ExercisesList from "./list/exercises";
 import NutritionsList from "./list/nutritions";
 import SelectedExercises from "./list/selectedExercises";
-import { createWorkout } from "services/workouts";
-import { useNavigate } from "react-router-dom";
-import { useTitleCase } from "hooks";
 
 const INITIAL_STATE = {
   title: null,
@@ -61,6 +59,10 @@ const WorkoutBuilder = () => {
   const [editData, setEditData] = useState({});
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
+
+  console.log("exercises", exercises);
+  console.log("nutritions", nutritions);
+  console.log("selected", selected);
 
   useEffect(() => {
     setSearch("");
@@ -106,8 +108,8 @@ const WorkoutBuilder = () => {
       options = _.pickBy(options, _.identity);
       const response = await getExercises(options);
       const data = _.map(response.data, (row) => ({ ...row, type: "exercises" }));
-      const filtered = _.filter(data, (row) => !_.find(selected, (sel) => sel.id === row.id));
-      setExercises(filtered);
+      // const filtered = _.filter(data, (row) => !_.find(selected, (sel) => sel.id === row.id));
+      setExercises(data);
     } catch (error) {
       setToast(
         dispatch,
@@ -121,8 +123,8 @@ const WorkoutBuilder = () => {
       options = _.pickBy(options, _.identity);
       const response = await getNutritions(options);
       const data = _.map(response.data, (row) => ({ ...row, type: "nutritions" }));
-      const filtered = _.filter(data, (row) => !_.find(selected, (sel) => sel.id === row.id));
-      setNutritions(filtered);
+      // const filtered = _.filter(data, (row) => !_.find(selected, (sel) => sel.id === row.id));
+      setNutritions(data);
     } catch (error) {
       setToast(
         dispatch,
@@ -190,6 +192,11 @@ const WorkoutBuilder = () => {
 
     let selectedItems = _.cloneDeep(selected);
 
+    console.log("result", result);
+
+    const draggable = result.draggableId.split(":");
+    const draggableId = draggable[1];
+
     const source = result.source.droppableId?.split("-");
     const from = source?.[0];
     const fromPlacement = source?.[1];
@@ -198,69 +205,89 @@ const WorkoutBuilder = () => {
     const to = destination?.[0];
     const toPlacement = destination?.[1];
 
+    console.log("source", source);
+    console.log("from", from);
+    console.log("fromPlacement", fromPlacement);
+    console.log("destination", destination);
+    console.log("to", to);
+    console.log("toPlacement", toPlacement);
+
     if (
       to !== TYPES.EXERCISES &&
       to !== TYPES.NUTRITIONS &&
       (from === TYPES.EXERCISES || from === TYPES.NUTRITIONS)
     ) {
+      // --------------- when dragged from nutritions or exercises into the canvas
       const draggedItem =
-        _.find(exercises, (row) => row.id === result.draggableId) ||
-        _.find(nutritions, (row) => row.id === result.draggableId);
+        _.find(exercises, (row) => row.id === draggableId) ||
+        _.find(nutritions, (row) => row.id === draggableId);
 
       if (_.isEmpty(selected)) {
         selectedItems.push(draggedItem);
-        setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
-        setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+        // setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+        // setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
       } else if (+result.destination.droppableId > selectedItems.length) {
         selectedItems.push(draggedItem);
-        setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
-        setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+        // setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+        // setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
       } else {
         const replacedItem = selectedItems[+to - 1];
         if (from === TYPES.NUTRITIONS) {
           if (replacedItem.type === TYPES.NUTRITIONS) {
-            setNutritions((prev) => [
-              ..._.filter(prev, (row) => row.id !== draggedItem.id),
-              replacedItem,
-            ]);
+            // setNutritions((prev) => [
+            //   ..._.filter(prev, (row) => row.id !== draggedItem.id),
+            //   replacedItem,
+            // ]);
           } else {
-            setExercises((prev) => [
-              ..._.filter(prev, (row) => row.id !== draggedItem.id),
-              replacedItem,
-            ]);
-            setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+            // setExercises((prev) => [
+            //   ..._.filter(prev, (row) => row.id !== draggedItem.id),
+            //   replacedItem,
+            // ]);
+            // setNutritions((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
           }
         } else {
           if (replacedItem.type === TYPES.EXERCISES) {
-            setExercises((prev) => [
-              ..._.filter(prev, (row) => row.id !== draggedItem.id),
-              replacedItem,
-            ]);
+            // setExercises((prev) => [
+            //   ..._.filter(prev, (row) => row.id !== draggedItem.id),
+            //   replacedItem,
+            // ]);
           } else {
-            setNutritions((prev) => [
-              ..._.filter(prev, (row) => row.id !== draggedItem.id),
-              replacedItem,
-            ]);
-            setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
+            // setNutritions((prev) => [
+            //   ..._.filter(prev, (row) => row.id !== draggedItem.id),
+            //   replacedItem,
+            // ]);
+            // setExercises((prev) => _.filter(prev, (row) => row.id !== draggedItem.id));
           }
         }
         selectedItems[+to - 1] = draggedItem;
       }
     } else if (!fromPlacement && !toPlacement && !!selectedItems[+to - 1]) {
+      // --------------- when selected items are re-arranged
+      console.log("-----------2------------");
       const item = selectedItems[+to - 1];
       selectedItems[+to - 1] = selectedItems[+from - 1];
       selectedItems[+from - 1] = item;
     } else if (!fromPlacement && (to === TYPES.EXERCISES || to === TYPES.NUTRITIONS)) {
-      const draggedItem = _.find(selectedItems, (row) => row.id === result.draggableId);
+      // --------------- when dragged from selected to exercises or nutritions
+      // const draggedItem = _.find(
+      //   selectedItems,
+      //   (row, index) => `${index}:${row.id}` === result.draggableId
+      // );
 
-      if (draggedItem.type === TYPES.EXERCISES && to === TYPES.EXERCISES) {
-        setExercises((prev) => [draggedItem, ...prev]);
-        selectedItems = selectedItems.filter((row) => row.id !== draggedItem.id);
-      }
-      if (draggedItem.type === TYPES.NUTRITIONS && to === TYPES.NUTRITIONS) {
-        setNutritions((prev) => [draggedItem, ...prev]);
-        selectedItems = selectedItems.filter((row) => row.id !== draggedItem.id);
-      }
+      // console.log("draggedItem", draggedItem);
+
+      // if (draggedItem.type === TYPES.EXERCISES && to === TYPES.EXERCISES) {
+      //   // setExercises((prev) => [draggedItem, ...prev]);
+      //   selectedItems = selectedItems.filter((row, index) => `${index}:${row.id}` !== result.draggableId);
+      // }
+      // if (draggedItem.type === TYPES.NUTRITIONS && to === TYPES.NUTRITIONS) {
+      //   // setNutritions((prev) => [draggedItem, ...prev]);
+      //   selectedItems = selectedItems.filter((row, index) => `${index}:${row.id}` !== result.draggableId);
+      // }
+
+      selectedItems = selectedItems.filter(
+        (row, index) => `${index}:${row.id}` !== result.draggableId
+      );
     }
 
     setSelected(selectedItems);
@@ -280,15 +307,15 @@ const WorkoutBuilder = () => {
     setShowEditModal(true);
   };
 
-  const removeItem = (id) => {
-    const item = _.find(selected, (row) => row.id === id);
-    const selecteds = _.filter(selected, (row) => row.id !== id);
-    if (item.type === TYPES.EXERCISES) {
-      setExercises((prev) => [item, ...prev]);
-    }
-    if (item.type === TYPES.NUTRITIONS) {
-      setNutritions((prev) => [item, ...prev]);
-    }
+  const removeItem = (index) => {
+    // const item = _.find(selected, (row) => row.id === id);
+    const selecteds = _.filter(selected, (_, i) => i !== index);
+    // if (item.type === TYPES.EXERCISES) {
+    //   // setExercises((prev) => [item, ...prev]);
+    // }
+    // if (item.type === TYPES.NUTRITIONS) {
+    //   // setNutritions((prev) => [item, ...prev]);
+    // }
     setSelected(selecteds);
   };
 
@@ -337,7 +364,7 @@ const WorkoutBuilder = () => {
                 <Grid container spacing={4}>
                   <Grid item xs={9}>
                     <div className="flex flex-col gap-4">
-                      <div className="flex justify-between items-center gap-4 h-[40px]">
+                      <div className="flex justify-start items-center gap-4 h-[40px]">
                         {titleEdit ? (
                           <Input
                             name="title"
@@ -346,10 +373,20 @@ const WorkoutBuilder = () => {
                             placeholder="Workout Title"
                             value={workout.title}
                             onChange={handleWorkoutChange}
+                            autoFocus
                           />
                         ) : (
                           <div className="flex items-center gap-2">
-                            <Typography variant="h3">{workout.title || "Workout Title"}</Typography>
+                            <h1
+                              className="cursor-pointer hover:text-indigo-700/60 transition duration-300 ease-in-out font-[700] text-[30px]"
+                              onClick={() => setTitleEdit(true)}
+                            >
+                              {workout.title || (
+                                <span>
+                                  Untitled Workout <span className="text-lg">(Click to edit)</span>
+                                </span>
+                              )}
+                            </h1>
                             {error === "title" && (
                               <div className="text-red-400 text-sm">Title is required!</div>
                             )}
@@ -361,26 +398,24 @@ const WorkoutBuilder = () => {
                           </div>
                         )}
                         {titleEdit ? (
-                          <MDButton
-                            variant="gradient"
-                            color="primary"
-                            size="small"
+                          <Typography
+                            variant="b"
+                            className="text-sm text-indigo-700 cursor-pointer font-[500]"
                             onClick={() => setTitleEdit(false)}
                           >
                             Done
-                          </MDButton>
+                          </Typography>
                         ) : (
-                          <MDButton
-                            variant="outlined"
-                            color="primary"
-                            size="small"
+                          <Typography
+                            variant="b"
+                            className="text-sm text-indigo-700 cursor-pointer font-[500]"
                             onClick={() => setTitleEdit(true)}
                           >
                             Edit
-                          </MDButton>
+                          </Typography>
                         )}
                       </div>
-                      <div className="flex justify-between items-center gap-4 h-[40px]">
+                      <div className="flex justify-start items-center gap-4 h-[40px]">
                         {descEdit ? (
                           <Input
                             multiline
@@ -390,57 +425,66 @@ const WorkoutBuilder = () => {
                             placeholder="Workout Description"
                             value={workout.description}
                             onChange={handleWorkoutChange}
+                            autoFocus
                           />
                         ) : (
                           <Typography
                             variant="body2"
-                            className="flex justify-between items-center gap-4 h-[40px]"
+                            className="cursor-pointer hover:text-indigo-700/60 transition duration-300 ease-in-out"
+                            onClick={() => setDescEdit(true)}
                           >
-                            {workout.description || "Workout Description"}
+                            {workout.description || (
+                              <span className="text-xs">
+                                Workout Description: Provide detailed instructions or information
+                                about your workout here <span>(Click to edit)</span>
+                              </span>
+                            )}
                           </Typography>
                         )}
                         {descEdit ? (
-                          <MDButton
-                            variant="gradient"
-                            color="primary"
-                            size="small"
+                          <Typography
+                            variant="b"
+                            className="text-sm text-indigo-700 cursor-pointer font-[500]"
                             onClick={() => setDescEdit(false)}
                           >
                             Done
-                          </MDButton>
+                          </Typography>
                         ) : (
-                          <MDButton
-                            variant="outlined"
-                            color="primary"
-                            size="small"
+                          <Typography
+                            variant="b"
+                            className="text-sm text-indigo-700 cursor-pointer font-[500]"
                             onClick={() => setDescEdit(true)}
                           >
                             Edit
-                          </MDButton>
+                          </Typography>
                         )}
                       </div>
                     </div>
                   </Grid>
                   <Grid item xs={3}>
-                    <div className="flex justify-end items-end h-full gap-2">
-                      <Tooltip title="Reset">
-                        <div className="border rounded-full border-[#7560C5] bg-white">
-                          <IconButton
-                            color="primary"
-                            aria-label="Add"
-                            onClick={handleClearSelected}
-                          >
-                            <Icon fontSize="small">refresh</Icon>
-                          </IconButton>
-                        </div>
-                      </Tooltip>
-                      <Tooltip title="Create & Send">
-                        <div className="border rounded-full border-[#7560C5] bg-white">
-                          <IconButton color="primary" aria-label="Add" onClick={handleSubmit}>
-                            <Icon fontSize="small">send</Icon>
-                          </IconButton>
-                        </div>
-                      </Tooltip>
+                    <div className="flex flex-col justify-center items-end h-full gap-2">
+                      <div className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer">
+                        <IconButton
+                          color="primary"
+                          aria-label="Add"
+                          onClick={handleSubmit}
+                          className="flex items-center gap-1"
+                        >
+                          <Icon fontSize="small">send</Icon>
+                          <b className="text-sm">Save & Send Workout</b>
+                        </IconButton>
+                      </div>
+                      <div className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer">
+                        <IconButton
+                          color="primary"
+                          aria-label="Add"
+                          onClick={handleClearSelected}
+                          className="flex items-center gap-1"
+                        >
+                          <Icon fontSize="small">delete_outline</Icon>
+                          <b className="text-sm">Clear Workout</b>
+                        </IconButton>
+                      </div>
                       {/* <Tooltip title="Save">
                         <div className="border rounded-full border-[#7560C5] bg-white">
                           <IconButton color="primary" aria-label="Add">
@@ -479,7 +523,7 @@ const WorkoutBuilder = () => {
                 >
                   <Input
                     style={{ color: "white", width: "100%", fontSize: 18 }}
-                    placeholder="Search by name"
+                    placeholder="Search by Name, Muscle or Fitness disciplines"
                     color="secondary"
                     value={search}
                     onChange={handleSearchChange}

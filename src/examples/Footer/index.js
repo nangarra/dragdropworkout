@@ -1,30 +1,7 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
-
-// @mui material components
 import Link from "@mui/material/Link";
-import Icon from "@mui/material/Icon";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-
-// Material Dashboard 2 React base styles
 import typography from "assets/theme/base/typography";
 
 function Footer({ company, links, className }) {
@@ -49,8 +26,8 @@ function Footer({ company, links, className }) {
       flexDirection={{ xs: "column", lg: "row" }}
       justifyContent="space-between"
       alignItems="center"
-      px={1.5}
-      py={2}
+      px={0}
+      pt={2}
     >
       <MDBox
         display="flex"
@@ -59,23 +36,22 @@ function Footer({ company, links, className }) {
         flexWrap="wrap"
         color="text"
         fontSize={size.sm}
-        px={1.5}
+        px={0}
       >
-        &copy; {new Date().getFullYear()}, made with
-        <MDBox fontSize={size.md} color="text" mb={-0.5} mx={0.25}>
-          <Icon color="inherit" fontSize="inherit">
-            favorite
-          </Icon>
-        </MDBox>
-        by
-        <Link target="_blank">
-          <MDTypography variant="button" fontWeight="medium">
-            &nbsp;Nick&nbsp;
-          </MDTypography>
-        </Link>
-        for a better web.
+        DragDropWorkout: Your free workout planner that simplifies planning and executing workouts
+        within minutes.
       </MDBox>
       <MDBox
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        flexWrap="wrap"
+        color="text"
+        fontSize={size.sm}
+      >
+        Copyright © Nangarra Inc {new Date().getFullYear()}.
+      </MDBox>
+      {/* <MDBox
         component="ul"
         sx={({ breakpoints }) => ({
           display: "flex",
@@ -93,7 +69,7 @@ function Footer({ company, links, className }) {
         })}
       >
         {renderLinks()}
-      </MDBox>
+      </MDBox> */}
     </MDBox>
   );
 }

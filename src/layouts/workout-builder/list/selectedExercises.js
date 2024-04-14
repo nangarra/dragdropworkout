@@ -24,6 +24,7 @@ const TYPES = {
 const SelectedExercises = (props) => {
   const { data = [], hoveredPlace, dragging, editItem, removeItem, error } = props;
   const [hoverItem, setHoverItem] = useState(null);
+  const [deleteHover, setDeleteHover] = useState(null);
 
   const selected =
     data.length < 9 ? [...data, ...Array(9 - data.length).fill({ dummy: true })] : data;
@@ -34,12 +35,13 @@ const SelectedExercises = (props) => {
         {BG.map((bg) => (
           <div
             key={bg.label}
-            className="grid items-center justify-center rounded-lg text-[150px] h-[250px]"
+            className="grid items-start justify-center rounded-lg text-[150px] h-[250px]"
           >
             <b
               className={`${error === "selected" && "text-red-400"} ${
                 String(hoveredPlace) === bg.label ? "text-indigo-700/60" : "text-gray-100"
               } transition duration-300 ease-in-out`}
+              style={{ lineHeight: "normal" }}
             >
               {bg.label}
             </b>
@@ -49,18 +51,22 @@ const SelectedExercises = (props) => {
 
       {selected.map((row, index) =>
         row.id ? (
-          <Droppable key={row.id} droppableId={String(index + 1)}>
+          <Droppable key={`${index}:${row.id}`} droppableId={String(index + 1)}>
             {(provided) => (
               <ul
                 {...provided.droppableProps}
                 ref={provided.innerRef}
                 className={`${
-                  hoverItem === row.id ? "shadow-md rounded-lg" : ""
+                  hoverItem === index
+                    ? `rounded-lg ${
+                        deleteHover === index ? "border-2 border border-red-400" : "shadow-md"
+                      }`
+                    : ""
                 } transition duration-300 ease-in-out flex flex-col gap-2 z-20 relative overflow-hidden`}
-                onMouseEnter={() => setHoverItem(row.id)}
+                onMouseEnter={() => setHoverItem(index)}
                 onMouseLeave={() => setHoverItem(null)}
               >
-                <Draggable draggableId={row.id} index={index}>
+                <Draggable draggableId={`${index}:${row.id}`} index={index}>
                   {(provided) => (
                     <li
                       ref={provided.innerRef}
@@ -70,43 +76,50 @@ const SelectedExercises = (props) => {
                     >
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: hoverItem === row.id && !dragging ? "auto" : 0 }}
+                        animate={{ width: hoverItem === index && !dragging ? "auto" : 0 }}
                         className="absolute top-0 right-0 grid w-full h-[159px] justify-end overflow-hidden z-50 bg-white"
                       >
                         <div className="flex flex-col items-center gap-2 p-2">
                           <Tooltip title="Remove" placement="right">
                             <Icon
-                              onClick={() => removeItem(row.id)}
+                              onClick={() => removeItem(index)}
+                              onMouseEnter={() => setDeleteHover(index)}
+                              onMouseLeave={() => setDeleteHover(null)}
                               className="text-gray-400 hover:text-red-400 cursor-pointer font-bold"
                             >
                               close
                             </Icon>
                           </Tooltip>
-                          <Tooltip title="Edit" placement="right">
+                          {/* <Tooltip title="Edit" placement="right">
                             <Icon
                               onClick={() => editItem(row)}
                               className="text-gray-400 hover:text-blue-400 cursor-pointer"
                             >
                               edit
                             </Icon>
-                          </Tooltip>
+                          </Tooltip> */}
                         </div>
                       </motion.div>
-                      <div className="flex justify-center h-[150px] rounded-lg overflow-hidden cursor-drag">
+                      <div className="flex items-center justify-center h-[150px] rounded-lg overflow-hidden cursor-drag">
                         <img
                           src={row.thumbnail || "/img/no-image.png"}
-                          className={`w-1/2 object-cover ${row.thumbnail ? "" : "opacity-50"}`}
+                          className={`w-1/2 h-fit object-cover ${
+                            row.thumbnail ? "" : "opacity-50"
+                          }`}
                         />
                       </div>
                       <Typography
                         variant="p"
                         component="div"
-                        className="flex items-center justify-center font-semibold text-lg py-1"
+                        className="flex items-center justify-center font-semibold text-lg pb-1 pt-2"
                       >
                         <span>{row.title}</span>
                       </Typography>
                       {row.type === TYPES.EXERCISES && (
-                        <div className="grid grid-cols-2 text-xs justify-center">
+                        <div
+                          className="grid grid-cols-2 text-xs justify-center cursor-pointer hover:bg-indigo-700/30 hover:text-white transition duration-300 ease-in-out"
+                          onClick={() => editItem(row)}
+                        >
                           <div className="flex items-center justify-center gap-2">
                             <b className="text-lg">
                               {row.sets
@@ -160,7 +173,7 @@ const SelectedExercises = (props) => {
                         </div>
                       )}
                       {row.type === TYPES.NUTRITIONS && (
-                        <div className="grid grid-cols-2 text-xs justify-center">
+                        <div className="grid grid-cols-2 text-xs justify-center cursor-pointer hover:text-indigo-700/60 transition duration-300 ease-in-out">
                           <div className="flex items-center justify-center gap-2">
                             <b className="text-lg">{row.calories || "--"}</b> <span>g</span>{" "}
                             <span>Calories</span>

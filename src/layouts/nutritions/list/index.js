@@ -126,10 +126,12 @@ const NutritionList = (props) => {
                   className="cursor-pointer hover:shadow-md relative overflow-hidden"
                   style={{ borderRadius: 8 }}
                 >
-                  <div className="flex justify-center h-[160px] border-b border-gray-300">
+                  <div className="flex justify-center items-center h-[160px] border-b border-gray-300">
                     <img
                       src={row.thumbnail || "/img/no-image.png"}
-                      className={`w-1/2 object-cover ${row.thumbnail ? "" : "opacity-50"}`}
+                      className={`w-1/3 sm:w-1/2 lg:w-1/3 h-fit object-cover ${
+                        row.thumbnail ? "" : "opacity-50"
+                      }`}
                     />
                   </div>
                   <motion.div
