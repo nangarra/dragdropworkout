@@ -5,8 +5,11 @@ import {
   FormHelperText,
   Icon,
   IconButton,
+  Stack,
+  Switch,
   TextField,
   Typography,
+  styled,
 } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
@@ -29,6 +32,8 @@ const NutritionForm = (props) => {
   const [hover, setHover] = useState(false);
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState({});
+  const [value, setValue] = useState({});
+  const [followsMe, setFollowsMe] = useState({});
 
   useEffect(() => {
     setValues(nutrition.id ? nutrition : DEFAULT_VALUES);
@@ -98,6 +103,13 @@ const NutritionForm = (props) => {
     };
   };
 
+  const handleNutritionChange = (event) => {
+    const newValue = event.target.value.replace(/[^0-9]/g, "");
+    if (newValue > 999) return;
+    setValue((prev) => ({ ...prev, [event.target.name]: +newValue }));
+    return;
+  };
+
   const Header = () => (
     <Typography variant="h4" className="flex justify-between p-4 border-b">
       {nutrition?.id ? "Edit" : "Add"} New Nutrition
@@ -137,6 +149,76 @@ const NutritionForm = (props) => {
               value={values.description}
             />
           </FormControl>
+
+          <div className="flex items-center justify-center gap-8">
+            <div
+              className={`grid items-center justify-center w-[100px] h-[70px] border border-1 rounded-md cursor-pointer text-sm transition duration-300 ease-in-out ${
+                followsMe ? "text-white bg-[#7560C5]" : "text-gray-400 border-gray-300"
+              }`}
+              onClick={() => setFollowsMe(true)}
+            >
+              Per Unit
+            </div>
+            {/* <Switch
+              color="primary"
+              checked={followsMe}
+              onChange={() => setFollowsMe((prev) => !prev)}
+            /> */}
+            <div
+              className={`grid items-center justify-center w-[100px] h-[70px] border border-1 rounded-md cursor-pointer text-sm transition duration-300 ease-in-out ${
+                followsMe ? "text-gray-400 border-gray-300" : "text-white bg-[#7560C5]"
+              }`}
+              onClick={() => setFollowsMe(false)}
+            >
+              Per 100 g
+            </div>
+          </div>
+          <div className="grid grid-cols-2 justify-center gap-8 text-[20px]">
+            <div className="flex items-center gap-2">
+              <input
+                name="calories"
+                value={value.calories}
+                onChange={handleNutritionChange}
+                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
+              />
+              <span className="text-gray-400">
+                <span>g</span> <span>Calories</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                name="fat"
+                value={value.fat}
+                onChange={handleNutritionChange}
+                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
+              />
+              <span className="text-gray-400">
+                <span>g</span> <span>Fat</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                name="protein"
+                value={value.protein}
+                onChange={handleNutritionChange}
+                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
+              />
+              <span className="text-gray-400">
+                <span>g</span> <span>Protein</span>
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                name="pcs"
+                value={value.pcs}
+                onChange={handleNutritionChange}
+                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
+              />
+              <span className="text-gray-400">
+                <span>g</span> <span>pcs</span>
+              </span>
+            </div>
+          </div>
 
           <FormControl>
             <MDButton variant="gradient" color="primary" component="label" htmlFor="upload-file">
