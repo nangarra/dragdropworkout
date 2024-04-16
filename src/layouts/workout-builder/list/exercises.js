@@ -1,8 +1,8 @@
 import { Paper, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import _ from "lodash";
-import React, { useState } from "react";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { useState } from "react";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 
 const ExercisesList = (props) => {
   const { data = [], hoveredPlace } = props;
@@ -62,9 +62,12 @@ const ExercisesList = (props) => {
                           gutterBottom
                           variant="p"
                           component="div"
-                          className="flex items-center justify-between text-sm font-semibold"
+                          className="flex flex-col text-sm font-semibold"
                         >
                           <span>{row.title}</span>
+                          <span className="text-xs text-gray-400 font-normal">
+                            {row.discipline}
+                          </span>
                         </Typography>
 
                         <motion.div
@@ -134,6 +137,9 @@ const ExercisesList = (props) => {
                           className="flex items-center justify-between text-sm font-semibold"
                         >
                           <span>{row.title}</span>
+                          <span className="text-xs text-gray-400 font-normal">
+                            {row.discipline}
+                          </span>
                         </Typography>
 
                         <motion.div

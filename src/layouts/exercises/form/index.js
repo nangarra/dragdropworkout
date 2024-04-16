@@ -20,7 +20,7 @@ import { saveExercise } from "services/exercises";
 
 const style = { width: 600 };
 
-const DEFAULT_VALUES = { title: null, description: null, thumbnail: null };
+const DEFAULT_VALUES = { title: null, description: null, discipline: null, thumbnail: null };
 
 const ExerciseForm = (props) => {
   const { open, onClose, exercise = {} } = props;
@@ -53,11 +53,22 @@ const ExerciseForm = (props) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    let errors = false;
 
     if (!values.title) {
       setError((prev) => ({ ...prev, title: true }));
+      errors = true;
+    }
+
+    if (!values.discipline) {
+      setError((prev) => ({ ...prev, discipline: true }));
+      errors = true;
+    }
+
+    if (errors) {
       return;
     }
+
     setLoading(true);
     try {
       const response = await saveExercise(values);
@@ -124,6 +135,21 @@ const ExerciseForm = (props) => {
                 error={errors.title}
               />
               {errors.title && <FormHelperText>Title is required</FormHelperText>}
+            </MDBox>
+          </FormControl>
+
+          <FormControl fullWidth required error={errors.discipline}>
+            <MDBox>
+              <MDInput
+                fullWidth
+                type="text"
+                name="discipline"
+                label="Discipline"
+                value={values.discipline}
+                onChange={handleChange}
+                error={errors.discipline}
+              />
+              {errors.discipline && <FormHelperText>Discipline is required</FormHelperText>}
             </MDBox>
           </FormControl>
 
