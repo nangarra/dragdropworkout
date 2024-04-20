@@ -8,19 +8,15 @@ import {
   IconButton,
   Radio,
   RadioGroup,
-  Stack,
-  Switch,
   TextField,
   Typography,
-  styled,
 } from "@mui/material";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import Notification from "components/Notification";
 import { NUTRITION_TYPE } from "constants";
-import { useMaterialUIController } from "context";
-import { setToast } from "context";
+import { setToast, useMaterialUIController } from "context";
 import { navbarIconButton } from "examples/Navbars/DashboardNavbar/styles";
 import { useEffect, useState } from "react";
 import { saveNutrition } from "services/nutritions";
@@ -34,7 +30,7 @@ const DEFAULT_VALUES = {
   calories: null,
   fat: null,
   protein: null,
-  type: NUTRITION_TYPE.PER_UNIT,
+  nutritionType: NUTRITION_TYPE.PER_UNIT,
 };
 
 const NutritionForm = (props) => {
@@ -187,16 +183,16 @@ const NutritionForm = (props) => {
             <RadioGroup
               aria-labelledby="demo-radio-buttons-group-label"
               name="radio-buttons-group"
-              value={values.type}
-              onChange={(e) => setValues((state) => ({ ...state, type: e.target.value }))}
+              value={values.nutritionType}
+              onChange={(e) => setValues((state) => ({ ...state, nutritionType: e.target.value }))}
             >
               <FormControlLabel
-                value={NUTRITION_TYPE.PER_UNIT}
+                value={NUTRITION_TYPE.PER_100_G}
                 control={<Radio />}
                 label="Per 100 g"
               />
               <FormControlLabel
-                value={NUTRITION_TYPE.PER_100_G}
+                value={NUTRITION_TYPE.PER_UNIT}
                 control={<Radio />}
                 label="Per Unit"
               />

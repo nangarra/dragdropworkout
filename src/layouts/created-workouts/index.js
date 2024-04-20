@@ -1,26 +1,14 @@
-import {
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Icon,
-  IconButton,
-  Paper,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Icon, IconButton, Paper, Typography } from "@mui/material";
+import classNames from "classnames";
 import Loading from "components/Loading";
-import MDButton from "components/MDButton";
+import { NUTRITION_TYPE } from "constants";
 import { AnimatePresence, motion } from "framer-motion";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getWorkout } from "services/workouts";
-import Loader from "./loader";
 import StarRatings from "react-star-ratings";
-import { setWorkoutRating } from "services/workouts";
-import classNames from "classnames";
+import { getWorkout, setWorkoutRating } from "services/workouts";
+import Loader from "./loader";
 const MY_WORKOUT_RATINGS = "MY_WORKOUT_RATINGS";
 
 const CreatedWorkouts = () => {
@@ -98,36 +86,6 @@ const CreatedWorkouts = () => {
 
   return (
     <BasicLayout>
-      {/* <Dialog
-        fullScreen={false}
-        open={open}
-        onClose={onClose}
-        aria-labelledby="responsive-dialog-title"
-      >
-        <DialogTitle id="responsive-dialog-title">Your Rating</DialogTitle>
-        <DialogContent>
-          <div className="flex max-w-[300px] justify-center p-8 mx-4">
-            <StarRatings
-              rating={rating}
-              changeRating={changeRating}
-              starDimension="30px"
-              starSpacing="2px"
-              starRatedColor="gold"
-              starHoverColor="#7560C5"
-              numberOfStars={5}
-              name="rating"
-            />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <MDButton size="small" variant="contained" color="white" onClick={onClose}>
-            Cancel
-          </MDButton>
-          <MDButton size="small" variant="gradient" color="primary" onClick={onConfirmRating}>
-            {confirming && <CircularProgress size={10} color="white" />}&nbsp;Confirm
-          </MDButton>
-        </DialogActions>
-      </Dialog> */}
       <Loading loading={loading} customLoader={<Loader />}>
         <div className="flex flex-col gap-8 p-2">
           <div className="flex flex-col">
@@ -282,11 +240,17 @@ const CreatedWorkouts = () => {
                           <span className="text-[15px]">g</span>{" "}
                           <span className="text-[15px]">Protein</span>
                         </div>
-                        <div className="flex items-center justify-center gap-2 p-2">
-                          <b className="text-[25px]">{row.pcs || "--"}</b>{" "}
-                          <span className="text-[15px]">g</span>{" "}
-                          <span className="text-[15px]">pcs</span>
-                        </div>
+                        {row.Nutrition?.nutritionType === NUTRITION_TYPE.PER_UNIT ? (
+                          <div className="flex items-center justify-center gap-2 p-2">
+                            <b className="text-[25px]">{row.pcs || "--"}</b>{" "}
+                            <span className="text-[15px]">pcs</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-2 p-2">
+                            <b className="text-[25px]">{row.grams || "--"}</b>{" "}
+                            <span className="text-[15px]">g</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

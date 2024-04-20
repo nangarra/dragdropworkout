@@ -1,7 +1,7 @@
-import { Icon, Paper, Tooltip, Typography } from "@mui/material";
+import { Icon, Tooltip, Typography } from "@mui/material";
+import { NUTRITION_TYPE } from "constants";
 import { motion } from "framer-motion";
-import _ from "lodash";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 
 const BG = [
@@ -189,10 +189,16 @@ const SelectedExercises = (props) => {
                             <b className="text-lg">{row.protein || "--"}</b> <span>g</span>{" "}
                             <span>Protein</span>
                           </div>
-                          <div className="flex items-center justify-center gap-2">
-                            <b className="text-lg">{row.pcs || "--"}</b> <span>g</span>{" "}
-                            <span>pcs</span>
-                          </div>
+                          {row.nutritionType === NUTRITION_TYPE.PER_100_G ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <b className="text-lg">{row.grams || "--"}</b>
+                              <span>g</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center gap-2">
+                              <b className="text-lg">{row.pcs || "--"}</b> <span>pcs</span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </li>

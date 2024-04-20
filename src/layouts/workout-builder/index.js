@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import MDBox from "components/MDBox";
 import Notification from "components/Notification";
+import { NUTRITION_TYPE } from "constants";
 import { setToast, useMaterialUIController } from "context";
 import { useTitleCase } from "hooks";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
@@ -59,10 +60,6 @@ const WorkoutBuilder = () => {
   const [editData, setEditData] = useState({});
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
-
-  console.log("exercises", exercises);
-  console.log("nutritions", nutritions);
-  console.log("selected", selected);
 
   useEffect(() => {
     setSearch("");
@@ -122,7 +119,12 @@ const WorkoutBuilder = () => {
     try {
       options = _.pickBy(options, _.identity);
       const response = await getNutritions(options);
-      const data = _.map(response.data, (row) => ({ ...row, type: "nutritions" }));
+      const data = _.map(response.data, (row) => ({
+        ...row,
+        type: "nutritions",
+        grams: row.nutritionType === NUTRITION_TYPE.PER_100_G ? 100 : null,
+        pcs: row.nutritionType === NUTRITION_TYPE.PER_UNIT ? 1 : null,
+      }));
       // const filtered = _.filter(data, (row) => !_.find(selected, (sel) => sel.id === row.id));
       setNutritions(data);
     } catch (error) {
@@ -192,8 +194,6 @@ const WorkoutBuilder = () => {
 
     let selectedItems = _.cloneDeep(selected);
 
-    console.log("result", result);
-
     const draggable = result.draggableId.split(":");
     const draggableId = draggable[1];
 
@@ -204,13 +204,6 @@ const WorkoutBuilder = () => {
     const destination = result.destination.droppableId?.split("-");
     const to = destination?.[0];
     const toPlacement = destination?.[1];
-
-    console.log("source", source);
-    console.log("from", from);
-    console.log("fromPlacement", fromPlacement);
-    console.log("destination", destination);
-    console.log("to", to);
-    console.log("toPlacement", toPlacement);
 
     if (
       to !== TYPES.EXERCISES &&
@@ -263,7 +256,6 @@ const WorkoutBuilder = () => {
       }
     } else if (!fromPlacement && !toPlacement && !!selectedItems[+to - 1]) {
       // --------------- when selected items are re-arranged
-      console.log("-----------2------------");
       const item = selectedItems[+to - 1];
       selectedItems[+to - 1] = selectedItems[+from - 1];
       selectedItems[+from - 1] = item;
@@ -273,8 +265,6 @@ const WorkoutBuilder = () => {
       //   selectedItems,
       //   (row, index) => `${index}:${row.id}` === result.draggableId
       // );
-
-      // console.log("draggedItem", draggedItem);
 
       // if (draggedItem.type === TYPES.EXERCISES && to === TYPES.EXERCISES) {
       //   // setExercises((prev) => [draggedItem, ...prev]);
