@@ -5,9 +5,10 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import PropTypes from "prop-types";
 import MDButton from "components/MDButton";
-import { Input } from "@mui/material";
+import { Input, Typography } from "@mui/material";
 import MDInput from "components/MDInput";
 import { useEffect, useState } from "react";
+import { NUTRITION_TYPE } from "constants";
 
 const EditForm = (props) => {
   const { onClose, open, data = {}, onSubmit } = props;
@@ -45,7 +46,24 @@ const EditForm = (props) => {
   const handleNutritionChange = (event) => {
     const newValue = event.target.value.replace(/[^0-9]/g, "");
     if (newValue > 999) return;
-    setValue((prev) => ({ ...prev, [event.target.name]: +newValue }));
+    if (value.type === NUTRITION_TYPE.PER_UNIT) {
+      setValue((prev) => ({
+        ...prev,
+        calories: +newValue + prev.calories,
+        fat: +newValue + prev.fat,
+        protein: +newValue + prev.protein,
+        [event.target.name]: +newValue,
+      }));
+    }
+    if (value.type === NUTRITION_TYPE.PER_100_G) {
+      setValue((prev) => ({
+        ...prev,
+        calories: +newValue + prev.calories,
+        fat: +newValue + prev.fat,
+        protein: +newValue + prev.protein,
+        [event.target.name]: +newValue,
+      }));
+    }
     return;
   };
 
@@ -108,30 +126,33 @@ const EditForm = (props) => {
         ) : (
           <div className="grid grid-cols-2 justify-center gap-8 p-4 text-[20px]">
             <div className="flex items-center gap-2">
-              <input
+              {/* <input
                 name="calories"
                 value={value.calories}
                 onChange={handleNutritionChange}
                 className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
-              />
+              /> */}
+              <Typography variant="h3">{value.calories}</Typography>
               <span>g</span> <span>Calories</span>
             </div>
             <div className="flex items-center gap-2">
-              <input
+              {/* <input
                 name="fat"
                 value={value.fat}
                 onChange={handleNutritionChange}
                 className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
-              />
+              /> */}
+              <Typography variant="h3">{value.fat}</Typography>
               <span>g</span> <span>Fat</span>
             </div>
             <div className="flex items-center gap-2">
-              <input
+              {/* <input
                 name="protein"
                 value={value.protein}
                 onChange={handleNutritionChange}
                 className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
-              />
+              /> */}
+              <Typography variant="h3">{value.protein}</Typography>
               <span>g</span> <span>Protein</span>
             </div>
             <div className="flex items-center gap-2">
@@ -141,7 +162,7 @@ const EditForm = (props) => {
                 onChange={handleNutritionChange}
                 className="w-[55px] rounded-lg border border-2 border-gray-300 p-2 focus:border-indigo-700/60 focus:outline-none"
               />
-              <span>g</span> <span>pcs</span>
+              <span>pcs</span>
             </div>
           </div>
         )}

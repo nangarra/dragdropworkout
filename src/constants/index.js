@@ -5,3 +5,8 @@ export const REQUEST_HEADER_AUTH_KEY = "Authorization";
 export const SERVER_API = process.env.REACT_APP_SERVER_API
   ? `${process.env.REACT_APP_SERVER_API}/api`
   : "/api";
+
+export const NUTRITION_TYPE = {
+  PER_UNIT: "perUnit",
+  PER_100_G: "per100g",
+};

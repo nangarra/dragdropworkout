@@ -2,9 +2,12 @@ import {
   CircularProgress,
   Drawer,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   Icon,
   IconButton,
+  Radio,
+  RadioGroup,
   Stack,
   Switch,
   TextField,
@@ -15,6 +18,7 @@ import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import Notification from "components/Notification";
+import { NUTRITION_TYPE } from "constants";
 import { useMaterialUIController } from "context";
 import { setToast } from "context";
 import { navbarIconButton } from "examples/Navbars/DashboardNavbar/styles";
@@ -23,7 +27,15 @@ import { saveNutrition } from "services/nutritions";
 
 const style = { width: 600 };
 
-const DEFAULT_VALUES = { title: null, description: null, thumbnail: null };
+const DEFAULT_VALUES = {
+  title: null,
+  description: null,
+  thumbnail: null,
+  calories: null,
+  fat: null,
+  protein: null,
+  type: NUTRITION_TYPE.PER_UNIT,
+};
 
 const NutritionForm = (props) => {
   const { open, onClose, nutrition = {} } = props;
@@ -32,8 +44,6 @@ const NutritionForm = (props) => {
   const [hover, setHover] = useState(false);
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState({});
-  const [value, setValue] = useState({});
-  const [followsMe, setFollowsMe] = useState({});
 
   useEffect(() => {
     setValues(nutrition.id ? nutrition : DEFAULT_VALUES);
@@ -58,11 +68,28 @@ const NutritionForm = (props) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    let errors = false;
     if (!values.title) {
       setError((prev) => ({ ...prev, title: true }));
+      errors = true;
+    }
+    if (!values.calories) {
+      setError((prev) => ({ ...prev, calories: true }));
+      errors = true;
+    }
+    if (!values.fat) {
+      setError((prev) => ({ ...prev, fat: true }));
+      errors = true;
+    }
+    if (!values.protein) {
+      setError((prev) => ({ ...prev, protein: true }));
+      errors = true;
+    }
+
+    if (errors) {
       return;
     }
+
     setLoading(true);
     try {
       const response = await saveNutrition(values);
@@ -104,9 +131,13 @@ const NutritionForm = (props) => {
   };
 
   const handleNutritionChange = (event) => {
-    const newValue = event.target.value.replace(/[^0-9]/g, "");
+    const { name, value } = event.target;
+    const newValue = value.replace(/[^0-9]/g, "");
+
+    setError((prev) => ({ ...prev, [name]: !value }));
+
     if (newValue > 999) return;
-    setValue((prev) => ({ ...prev, [event.target.name]: +newValue }));
+    setValues((prev) => ({ ...prev, [name]: +newValue }));
     return;
   };
 
@@ -118,6 +149,8 @@ const NutritionForm = (props) => {
       </IconButton>
     </Typography>
   );
+
+  console.log("values", values);
 
   return (
     <Drawer open={open} anchor="right" PaperProps={{ style }}>
@@ -150,74 +183,72 @@ const NutritionForm = (props) => {
             />
           </FormControl>
 
-          <div className="flex items-center justify-center gap-8">
-            <div
-              className={`grid items-center justify-center w-[100px] h-[70px] border border-1 rounded-md cursor-pointer text-sm transition duration-300 ease-in-out ${
-                followsMe ? "text-white bg-[#7560C5]" : "text-gray-400 border-gray-300"
-              }`}
-              onClick={() => setFollowsMe(true)}
+          <div className="flex items-center gap-8">
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              name="radio-buttons-group"
+              value={values.type}
+              onChange={(e) => setValues((state) => ({ ...state, type: e.target.value }))}
             >
-              Per Unit
-            </div>
-            {/* <Switch
-              color="primary"
-              checked={followsMe}
-              onChange={() => setFollowsMe((prev) => !prev)}
-            /> */}
-            <div
-              className={`grid items-center justify-center w-[100px] h-[70px] border border-1 rounded-md cursor-pointer text-sm transition duration-300 ease-in-out ${
-                followsMe ? "text-gray-400 border-gray-300" : "text-white bg-[#7560C5]"
-              }`}
-              onClick={() => setFollowsMe(false)}
-            >
-              Per 100 g
-            </div>
+              <FormControlLabel
+                value={NUTRITION_TYPE.PER_UNIT}
+                control={<Radio />}
+                label="Per 100 g"
+              />
+              <FormControlLabel
+                value={NUTRITION_TYPE.PER_100_G}
+                control={<Radio />}
+                label="Per Unit"
+              />
+            </RadioGroup>
           </div>
-          <div className="grid grid-cols-2 justify-center gap-8 text-[20px]">
-            <div className="flex items-center gap-2">
-              <input
-                name="calories"
-                value={value.calories}
-                onChange={handleNutritionChange}
-                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
-              />
-              <span className="text-gray-400">
-                <span>g</span> <span>Calories</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                name="fat"
-                value={value.fat}
-                onChange={handleNutritionChange}
-                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
-              />
-              <span className="text-gray-400">
-                <span>g</span> <span>Fat</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                name="protein"
-                value={value.protein}
-                onChange={handleNutritionChange}
-                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
-              />
-              <span className="text-gray-400">
-                <span>g</span> <span>Protein</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                name="pcs"
-                value={value.pcs}
-                onChange={handleNutritionChange}
-                className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
-              />
-              <span className="text-gray-400">
-                <span>g</span> <span>pcs</span>
-              </span>
-            </div>
+          <div className="grid grid-cols-3 justify-center gap-8 py-4">
+            <FormControl className="flex flex-col gap-2" required error={errors.calories}>
+              <div className="flex items-center gap-2">
+                <input
+                  name="calories"
+                  value={values.calories}
+                  onChange={handleNutritionChange}
+                  className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
+                />
+                <span className="flex gap-1 items-center text-sm">
+                  <span>g</span> <span>Calories</span>
+                </span>
+              </div>
+              {errors.calories && (
+                <FormHelperText style={{ margin: 0 }}>Calories is required</FormHelperText>
+              )}
+            </FormControl>
+            <FormControl className="flex flex-col gap-2" required error={errors.fat}>
+              <div className="flex items-center gap-2">
+                <input
+                  name="fat"
+                  value={values.fat}
+                  onChange={handleNutritionChange}
+                  className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
+                />
+                <span className="flex gap-1 items-center text-sm">
+                  <span>g</span> <span>Fat</span>
+                </span>
+              </div>
+              {errors.fat && <FormHelperText style={{ margin: 0 }}>Fat is required</FormHelperText>}
+            </FormControl>
+            <FormControl className="flex flex-col gap-2" required error={errors.protein}>
+              <div className="flex items-center gap-2">
+                <input
+                  name="protein"
+                  value={values.protein}
+                  onChange={handleNutritionChange}
+                  className="w-[55px] h-[55px] text-center rounded-md border border-1 focus:border-2 border-gray-300 p-2 focus:border-[#7560C5] focus:outline-none"
+                />
+                <span className="flex gap-1 items-center text-sm">
+                  <span>g</span> <span>Protein</span>
+                </span>
+              </div>
+              {errors.protein && (
+                <FormHelperText style={{ margin: 0 }}>Fat is required</FormHelperText>
+              )}
+            </FormControl>
           </div>
 
           <FormControl>

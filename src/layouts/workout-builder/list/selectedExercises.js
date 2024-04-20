@@ -173,7 +173,10 @@ const SelectedExercises = (props) => {
                         </div>
                       )}
                       {row.type === TYPES.NUTRITIONS && (
-                        <div className="grid grid-cols-2 text-xs justify-center cursor-pointer hover:text-indigo-700/60 transition duration-300 ease-in-out">
+                        <div
+                          className="grid grid-cols-2 text-xs justify-center cursor-pointer hover:bg-indigo-700/30 hover:text-white transition duration-300 ease-in-out"
+                          onClick={() => editItem(row)}
+                        >
                           <div className="flex items-center justify-center gap-2">
                             <b className="text-lg">{row.calories || "--"}</b> <span>g</span>{" "}
                             <span>Calories</span>
