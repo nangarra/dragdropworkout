@@ -40,7 +40,7 @@ const ExercisesList = (props) => {
       )} */}
       {fetching ? (
         <Loader />
-      ) : _.isEmpty(data) ? (
+      ) : _.isEmpty(evens) || _.isEmpty(odds) ? (
         <Droppable droppableId="exercises-empty">
           {(provided) => (
             <ul

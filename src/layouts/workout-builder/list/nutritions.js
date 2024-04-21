@@ -39,7 +39,7 @@ const NutritionsList = (props) => {
       )} */}
       {fetching ? (
         <Loader />
-      ) : _.isEmpty(data) ? (
+      ) : _.isEmpty(evens) || _.isEmpty(odds) ? (
         <Droppable droppableId="nutritions-empty">
           {(provided) => (
             <ul
