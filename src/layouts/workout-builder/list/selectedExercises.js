@@ -38,7 +38,7 @@ const SelectedExercises = (props) => {
             className="grid items-start justify-center rounded-lg text-[150px] h-[250px]"
           >
             <b
-              className={`${error === "selected" && "text-red-400"} ${
+              className={`${error.selected && "text-red-400"} ${
                 String(hoveredPlace) === bg.label ? "text-indigo-700/60" : "text-gray-100"
               } transition duration-300 ease-in-out`}
               style={{ lineHeight: "normal" }}

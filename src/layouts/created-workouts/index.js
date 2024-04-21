@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import StarRatings from "react-star-ratings";
 import { getWorkout, setWorkoutRating } from "services/workouts";
 import Loader from "./loader";
+import _ from "lodash";
 const MY_WORKOUT_RATINGS = "MY_WORKOUT_RATINGS";
 
 const CreatedWorkouts = () => {

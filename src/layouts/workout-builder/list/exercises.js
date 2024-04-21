@@ -65,9 +65,14 @@ const ExercisesList = (props) => {
                           className="flex flex-col text-sm font-semibold"
                         >
                           <span>{row.title}</span>
-                          <span className="text-xs text-gray-400 font-normal">
-                            {row.discipline}
-                          </span>
+
+                          <div className="flex flex-wrap gap-1">
+                            {row.discipline.map((dis) => (
+                              <span className="text-xs text-gray-400 font-normal border border-gray-400 rounded-full px-2">
+                                {dis}
+                              </span>
+                            ))}
+                          </div>
                         </Typography>
 
                         <motion.div
@@ -134,12 +139,16 @@ const ExercisesList = (props) => {
                           gutterBottom
                           variant="p"
                           component="div"
-                          className="flex items-center justify-between text-sm font-semibold"
+                          className="flex flex-col text-sm font-semibold"
                         >
                           <span>{row.title}</span>
-                          <span className="text-xs text-gray-400 font-normal">
-                            {row.discipline}
-                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {row.discipline.map((dis) => (
+                              <span className="text-xs text-gray-400 font-normal border border-gray-400 rounded-full px-2">
+                                {dis}
+                              </span>
+                            ))}
+                          </div>
                         </Typography>
 
                         <motion.div

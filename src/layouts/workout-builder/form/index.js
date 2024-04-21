@@ -96,6 +96,7 @@ const EditForm = (props) => {
   const handleKeyDown = (event) => {
     setError(null);
     const { code } = event;
+
     const { name, value: eventValue } = event.target;
     let newValue = Number(eventValue.replace(/[^0-9]/g, ""));
     if (newValue > 999) return;
@@ -221,6 +222,7 @@ const EditForm = (props) => {
                     value={value.grams}
                     onChange={handleNutritionChange}
                     onKeyDown={handleKeyDown}
+                    onKeyDownCapture={handleKeyDown}
                     className={classNames(
                       "w-[55px] rounded-lg border border-2  p-2 focus:border-indigo-700/60 focus:outline-none",
                       error ? "border-red-300" : "border-gray-300"

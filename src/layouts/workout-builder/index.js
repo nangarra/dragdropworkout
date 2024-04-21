@@ -26,6 +26,7 @@ import EditForm from "./form";
 import ExercisesList from "./list/exercises";
 import NutritionsList from "./list/nutritions";
 import SelectedExercises from "./list/selectedExercises";
+import MDButton from "components/MDButton";
 
 const INITIAL_STATE = {
   title: null,
@@ -41,6 +42,9 @@ const TABS = {
   EXERCISES: 0,
   NUTRITIONS: 1,
 };
+
+const BUTTON_EXERCISE_FILTERS = ["fitness", "cardio", "strength", "calisthenics"];
+const BUTTON_NUTRITION_FILTERS = ["protein shake", "steak", "eggs", "creatine"];
 
 const WorkoutBuilder = () => {
   const [controller, dispatch] = useMaterialUIController();
@@ -58,7 +62,13 @@ const WorkoutBuilder = () => {
   const [dragging, setDragging] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editData, setEditData] = useState({});
-  const [error, setError] = useState(null);
+  const [buttonFilters, setButtonFilters] = useState([]);
+  const [error, setError] = useState({
+    title: false,
+    description: false,
+    selected: false,
+    "unique-title": false,
+  });
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -74,17 +84,17 @@ const WorkoutBuilder = () => {
     if (selectedTab === TABS.NUTRITIONS) {
       getNutritionsData({ search });
     }
-  }, [search]);
+  }, [search, buttonFilters]);
 
   useEffect(() => {
     if (workout.title) {
-      setError(null);
+      setError((prev) => ({ ...prev, title: false }));
     }
   }, [titleEdit]);
 
   useEffect(() => {
     if (!_.isEmpty(selected)) {
-      setError(null);
+      setError((prev) => ({ ...prev, selected: false }));
     }
   }, [selected]);
 
@@ -102,6 +112,7 @@ const WorkoutBuilder = () => {
 
   const getExercisesData = async (options = {}) => {
     try {
+      options.discipline = buttonFilters;
       options = _.pickBy(options, _.identity);
       const response = await getExercises(options);
       const data = _.map(response.data, (row) => ({ ...row, type: "exercises" }));
@@ -117,6 +128,7 @@ const WorkoutBuilder = () => {
 
   const getNutritionsData = async (options = {}) => {
     try {
+      options.title = buttonFilters;
       options = _.pickBy(options, _.identity);
       const response = await getNutritions(options);
       const data = _.map(response.data, (row) => ({
@@ -142,14 +154,24 @@ const WorkoutBuilder = () => {
   };
 
   const handleSubmit = async () => {
+    let error = false;
     if (!workout.title) {
-      setError("title");
-      return;
+      setError((prev) => ({ ...prev, title: true }));
+      error = true;
     }
+
+    if (!workout.description) {
+      setError((prev) => ({ ...prev, description: true }));
+      error = true;
+    }
+
     if (_.isEmpty(selected)) {
-      setError("selected");
-      return;
+      setError((prev) => ({ ...prev, selected: true }));
+      error = true;
     }
+
+    if (error) return;
+
     setLoading(true);
     try {
       workout.selected = selected;
@@ -157,7 +179,7 @@ const WorkoutBuilder = () => {
       navigate(`/workouts/${useTitleCase(response.data.title)}`);
     } catch (error) {
       if (error?.response?.data?.message === "501") {
-        setError("unique-title");
+        setError((prev) => ({ ...prev, "unique-title": true }));
         setLoading(false);
         return;
       }
@@ -176,10 +198,12 @@ const WorkoutBuilder = () => {
   const handleWorkoutChange = (e) => {
     const { value, name } = e.target;
     setWorkout((prev) => ({ ...prev, [name]: value }));
+    setError((prev) => ({ ...prev, [name]: !value }));
   };
 
   const handleTabChange = (_, value) => {
     setSelectedTab(value);
+    setButtonFilters([]);
   };
 
   const handleSearchChange = (e) => {
@@ -320,6 +344,19 @@ const WorkoutBuilder = () => {
     handleClose();
   };
 
+  const handleDisciplineFilter = (event) => {
+    const { name } = event.target;
+
+    let discFilters = [...buttonFilters];
+    if (_.includes(discFilters, name)) {
+      discFilters = _.filter(discFilters, (d) => d !== name);
+    } else {
+      discFilters.push(name);
+    }
+
+    setButtonFilters(discFilters);
+  };
+
   return (
     <BasicLayout>
       {loading && (
@@ -364,6 +401,7 @@ const WorkoutBuilder = () => {
                             value={workout.title}
                             onChange={handleWorkoutChange}
                             autoFocus
+                            onBlur={() => setTitleEdit(false)}
                           />
                         ) : (
                           <div className="flex items-center gap-2">
@@ -377,10 +415,10 @@ const WorkoutBuilder = () => {
                                 </span>
                               )}
                             </h1>
-                            {error === "title" && (
+                            {error.title && (
                               <div className="text-red-400 text-sm">Title is required!</div>
                             )}
-                            {error === "unique-title" && (
+                            {error["unique-title"] && (
                               <div className="text-red-400 text-sm">
                                 Workout already exists. Please enter a unique title.
                               </div>
@@ -416,6 +454,7 @@ const WorkoutBuilder = () => {
                             value={workout.description}
                             onChange={handleWorkoutChange}
                             autoFocus
+                            onBlur={() => setDescEdit(false)}
                           />
                         ) : (
                           <Typography
@@ -428,6 +467,9 @@ const WorkoutBuilder = () => {
                                 Workout Description: Provide detailed instructions or information
                                 about your workout here <span>(Click to edit)</span>
                               </span>
+                            )}
+                            {error.description && (
+                              <div className="text-red-400 text-sm">Description is required!</div>
                             )}
                           </Typography>
                         )}
@@ -503,13 +545,14 @@ const WorkoutBuilder = () => {
               <div className="flex flex-col gap-5">
                 <MDBox
                   width="100%"
-                  px={4}
-                  pb={4}
-                  pt={3}
+                  px={2}
+                  pb={1}
+                  pt={1}
                   variant="gradient"
                   bgColor="primary"
                   borderRadius="lg"
                   coloredShadow="primary"
+                  className="flex flex-col gap-2"
                 >
                   <Input
                     style={{ color: "white", width: "100%", fontSize: 18 }}
@@ -523,6 +566,33 @@ const WorkoutBuilder = () => {
                       </InputAdornment>
                     }
                   />
+                  <div className="grid grid-cols-4 items-center gap-2">
+                    {selectedTab === TABS.EXERCISES &&
+                      BUTTON_EXERCISE_FILTERS.map((filter) => (
+                        <MDButton
+                          size="small"
+                          variant={buttonFilters.includes(filter) ? "contained" : "text"}
+                          color="white"
+                          name={filter}
+                          onClick={handleDisciplineFilter}
+                        >
+                          {filter}
+                        </MDButton>
+                      ))}
+
+                    {selectedTab === TABS.NUTRITIONS &&
+                      BUTTON_NUTRITION_FILTERS.map((filter) => (
+                        <MDButton
+                          size="small"
+                          variant={buttonFilters.includes(filter) ? "contained" : "text"}
+                          color="white"
+                          name={filter}
+                          onClick={handleDisciplineFilter}
+                        >
+                          {filter}
+                        </MDButton>
+                      ))}
+                  </div>
                 </MDBox>
                 <MDBox width="100%" p={2} bgColor="white" className="rounded-xl">
                   <AppBar position="static" className="mb-2">

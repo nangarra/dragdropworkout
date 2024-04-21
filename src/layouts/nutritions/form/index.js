@@ -146,8 +146,6 @@ const NutritionForm = (props) => {
     </Typography>
   );
 
-  console.log("values", values);
-
   return (
     <Drawer open={open} anchor="right" PaperProps={{ style }}>
       <form className="flex flex-col justify-between h-full" onSubmit={handleSubmit}>
