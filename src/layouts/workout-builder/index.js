@@ -73,6 +73,7 @@ const WorkoutBuilder = () => {
   });
   const [search, setSearch] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [noData, setNoData] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -131,6 +132,11 @@ const WorkoutBuilder = () => {
       const response = await getExercises(options);
       const data = _.map(response.data, (row) => ({ ...row, type: "exercises" }));
       // const filtered = _.filter(data, (row) => !_.find(selected, (sel) => sel.id === row.id));
+      if (_.isEmpty(data)) {
+        setNoData(true);
+      } else {
+        setNoData(false);
+      }
       setExercises(data);
     } catch (error) {
       setToast(
@@ -153,6 +159,11 @@ const WorkoutBuilder = () => {
         grams: row.nutritionType === NUTRITION_TYPE.PER_100_G ? 100 : null,
         pcs: row.nutritionType === NUTRITION_TYPE.PER_UNIT ? 1 : null,
       }));
+      if (_.isEmpty(data)) {
+        setNoData(true);
+      } else {
+        setNoData(false);
+      }
       // const filtered = _.filter(data, (row) => !_.find(selected, (sel) => sel.id === row.id));
       setNutritions(data);
     } catch (error) {
@@ -636,6 +647,7 @@ const WorkoutBuilder = () => {
                   <div className={`overflow-y-auto max-h-[795px] pb-2`}>
                     {selectedTab === TABS.EXERCISES && (
                       <ExercisesList
+                        noData={noData}
                         fetching={fetching}
                         data={exercises}
                         hoveredPlace={hoveredPlace}
@@ -643,6 +655,7 @@ const WorkoutBuilder = () => {
                     )}
                     {selectedTab === TABS.NUTRITIONS && (
                       <NutritionsList
+                        noData={noData}
                         fetching={fetching}
                         data={nutritions}
                         hoveredPlace={hoveredPlace}

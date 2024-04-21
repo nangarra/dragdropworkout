@@ -16,31 +16,16 @@ const Loader = () => (
 );
 
 const ExercisesList = (props) => {
-  const { data = [], hoveredPlace, fetching } = props;
+  const { data = [], hoveredPlace, fetching, noData = false } = props;
   const evens = data.filter((_, index) => index % 2 === 0);
   const odds = data.filter((_, index) => index % 2 !== 0);
 
   const [hover, setHover] = useState(null);
   return (
     <div className="grid grid-cols-2 gap-2">
-      {/* {_.isEmpty(data) && !fetching && (
-        <Droppable droppableId="exercises-empty">
-          {(provided) => (
-            <ul
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className={`grid justify-center items-center h-[200px] border rounded-lg transition duration-300 ease-in-out ${
-                hoveredPlace === "exercises-empty" ? "bg-gray-100" : ""
-              }`}
-            >
-              No more Exercises
-            </ul>
-          )}
-        </Droppable>
-      )} */}
       {fetching ? (
         <Loader />
-      ) : _.isEmpty(evens) || _.isEmpty(odds) ? (
+      ) : noData ? (
         <Droppable droppableId="exercises-empty">
           {(provided) => (
             <ul
