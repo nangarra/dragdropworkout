@@ -23,7 +23,7 @@ const ExercisesList = (props) => {
   const [hover, setHover] = useState(null);
   return (
     <div className="grid grid-cols-2 gap-2">
-      {_.isEmpty(data) && !fetching && (
+      {/* {_.isEmpty(data) && !fetching && (
         <Droppable droppableId="exercises-empty">
           {(provided) => (
             <ul
@@ -37,9 +37,23 @@ const ExercisesList = (props) => {
             </ul>
           )}
         </Droppable>
-      )}
+      )} */}
       {fetching ? (
         <Loader />
+      ) : _.isEmpty(data) ? (
+        <Droppable droppableId="exercises-empty">
+          {(provided) => (
+            <ul
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className={`grid justify-center items-center h-[200px] border rounded-lg transition duration-300 ease-in-out ${
+                hoveredPlace === "exercises-empty" ? "bg-gray-100" : ""
+              }`}
+            >
+              No more Exercises
+            </ul>
+          )}
+        </Droppable>
       ) : (
         <>
           <Droppable droppableId="exercises-even">
