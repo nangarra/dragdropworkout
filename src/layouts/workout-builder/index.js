@@ -51,6 +51,8 @@ const WorkoutBuilder = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+
   const [workout, setWorkout] = useState(INITIAL_STATE);
   const [titleEdit, setTitleEdit] = useState(false);
   const [descEdit, setDescEdit] = useState(false);
@@ -123,6 +125,7 @@ const WorkoutBuilder = () => {
 
   const getExercisesData = async (options = {}) => {
     try {
+      setFetching(true);
       options.discipline = buttonFilters;
       options = _.pickBy(options, _.identity);
       const response = await getExercises(options);
@@ -135,10 +138,12 @@ const WorkoutBuilder = () => {
         <Notification type="error" title="Something went wrong!" content={error?.message} />
       );
     }
+    setFetching(false);
   };
 
   const getNutritionsData = async (options = {}) => {
     try {
+      setFetching(true);
       options.title = buttonFilters;
       options = _.pickBy(options, _.identity);
       const response = await getNutritions(options);
@@ -156,6 +161,8 @@ const WorkoutBuilder = () => {
         <Notification type="error" title="Something went wrong!" content={error?.message} />
       );
     }
+
+    setFetching(false);
   };
 
   const handleClearSelected = () => {
@@ -628,10 +635,18 @@ const WorkoutBuilder = () => {
                   </AppBar>
                   <div className={`overflow-y-auto max-h-[795px] pb-2`}>
                     {selectedTab === TABS.EXERCISES && (
-                      <ExercisesList data={exercises} hoveredPlace={hoveredPlace} />
+                      <ExercisesList
+                        fetching={fetching}
+                        data={exercises}
+                        hoveredPlace={hoveredPlace}
+                      />
                     )}
                     {selectedTab === TABS.NUTRITIONS && (
-                      <NutritionsList data={nutritions} hoveredPlace={hoveredPlace} />
+                      <NutritionsList
+                        fetching={fetching}
+                        data={nutritions}
+                        hoveredPlace={hoveredPlace}
+                      />
                     )}
                   </div>
                 </MDBox>
