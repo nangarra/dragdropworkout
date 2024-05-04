@@ -74,10 +74,12 @@ const WorkoutBuilder = () => {
   const [search, setSearch] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [noData, setNoData] = useState(false);
+  const [maxHeight, setMaxHeight] = useState(795);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
+      setMaxHeight(795 - window.scrollY);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -386,6 +388,9 @@ const WorkoutBuilder = () => {
     setButtonFilters(discFilters);
   };
 
+  const myDiv = document.getElementById("side");
+  const sideWidth = myDiv?.offsetWidth;
+
   return (
     <BasicLayout>
       {loading && (
@@ -425,9 +430,9 @@ const WorkoutBuilder = () => {
                           <Input
                             name="title"
                             className="w-full"
+                            value={workout.title}
                             style={{ fontSize: 30 }}
                             placeholder="Workout Title"
-                            value={workout.title}
                             onChange={handleWorkoutChange}
                             autoFocus
                             onBlur={() => setTitleEdit(false)}
@@ -571,80 +576,75 @@ const WorkoutBuilder = () => {
 
             {/* --------------- Exercises & Nutritions */}
             <Grid item xs={4}>
-              <div className="flex flex-col gap-5 relative">
-                <div
-                  style={{
-                    position: isScrolled ? "fixed" : null,
-                    zIndex: isScrolled ? 40 : null,
-                    top: isScrolled ? 73 : null,
-                  }}
-                >
-                  <MDBox
-                    width="100%"
-                    px={isScrolled ? 1 : 2}
-                    pb={1}
-                    pt={1}
-                    variant="gradient"
-                    bgColor="primary"
-                    borderRadius="lg"
-                    coloredShadow="primary"
-                    className="flex flex-col gap-2"
-                  >
-                    <Input
-                      style={{ color: "white", width: "100%", fontSize: 18 }}
-                      placeholder="Search by Name, Muscle or Fitness disciplines"
-                      color="secondary"
-                      value={search}
-                      onChange={handleSearchChange}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <Icon className="text-white">search</Icon>
-                        </InputAdornment>
-                      }
-                    />
-                    <div className="grid grid-cols-4 items-center gap-2">
-                      {selectedTab === TABS.EXERCISES &&
-                        BUTTON_EXERCISE_FILTERS.map((filter) => (
-                          <MDButton
-                            size="small"
-                            variant={buttonFilters.includes(filter) ? "contained" : "text"}
-                            color="white"
-                            name={filter}
-                            onClick={handleDisciplineFilter}
-                          >
-                            {filter}
-                          </MDButton>
-                        ))}
-
-                      {selectedTab === TABS.NUTRITIONS &&
-                        BUTTON_NUTRITION_FILTERS.map((filter) => (
-                          <MDButton
-                            size="small"
-                            variant={buttonFilters.includes(filter) ? "contained" : "text"}
-                            color="white"
-                            name={filter}
-                            onClick={handleDisciplineFilter}
-                          >
-                            {filter}
-                          </MDButton>
-                        ))}
-                    </div>
-                  </MDBox>
-                </div>
+              <div
+                id="side"
+                className="flex flex-col gap-5 relative"
+                style={{
+                  position: isScrolled ? "fixed" : null,
+                  zIndex: isScrolled ? 40 : null,
+                  top: isScrolled ? 100 : null,
+                  width: isScrolled ? sideWidth : "auto",
+                }}
+              >
                 <MDBox
                   width="100%"
-                  p={2}
-                  bgColor="white"
-                  className="rounded-xl"
-                  mt={isScrolled ? 14 : 0}
+                  px={2}
+                  pb={1}
+                  pt={1}
+                  variant="gradient"
+                  bgColor="primary"
+                  borderRadius="lg"
+                  coloredShadow="primary"
+                  className="flex flex-col gap-2"
                 >
+                  <Input
+                    style={{ color: "white", width: "100%", fontSize: 18 }}
+                    placeholder="Search by Name, Muscle or Fitness disciplines"
+                    color="secondary"
+                    value={search}
+                    onChange={handleSearchChange}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Icon className="text-white">search</Icon>
+                      </InputAdornment>
+                    }
+                  />
+                  <div className="grid grid-cols-4 items-center gap-2">
+                    {selectedTab === TABS.EXERCISES &&
+                      BUTTON_EXERCISE_FILTERS.map((filter) => (
+                        <MDButton
+                          size="small"
+                          variant={buttonFilters.includes(filter) ? "contained" : "text"}
+                          color="white"
+                          name={filter}
+                          onClick={handleDisciplineFilter}
+                        >
+                          {filter}
+                        </MDButton>
+                      ))}
+
+                    {selectedTab === TABS.NUTRITIONS &&
+                      BUTTON_NUTRITION_FILTERS.map((filter) => (
+                        <MDButton
+                          size="small"
+                          variant={buttonFilters.includes(filter) ? "contained" : "text"}
+                          color="white"
+                          name={filter}
+                          onClick={handleDisciplineFilter}
+                        >
+                          {filter}
+                        </MDButton>
+                      ))}
+                  </div>
+                </MDBox>
+                <MDBox width="100%" p={2} bgColor="white" className="rounded-xl">
                   <AppBar position="static" className="mb-2">
                     <Tabs orientation="horizontal" value={selectedTab} onChange={handleTabChange}>
                       <Tab label="Exercises" />
                       <Tab label="Nutritions" />
                     </Tabs>
                   </AppBar>
-                  <div className={`overflow-y-auto max-h-[795px] pb-2`}>
+                  <div className={`overflow-y-auto pb-2`} style={{ maxHeight }}>
                     {selectedTab === TABS.EXERCISES && (
                       <ExercisesList
                         noData={noData}
