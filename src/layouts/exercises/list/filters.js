@@ -1,11 +1,13 @@
-import { Card, Grid } from "@mui/material";
+import { Card, Grid, Icon } from "@mui/material";
 import MDBox from "components/MDBox";
+import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
 import React from "react";
 
-const Filters = () => {
+const Filters = (props) => {
+  const { onAddNew } = props;
   return (
-    <MDBox pt={4} pb={3}>
+    <MDBox p={2}>
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Card>
@@ -19,8 +21,17 @@ const Filters = () => {
               borderRadius="lg"
               coloredShadow="primary"
             >
-              <MDTypography variant="h6" color="white">
+              <MDTypography
+                variant="h6"
+                color="white"
+                className="flex w-full justify-between items-center"
+              >
                 Exercise Listings
+                {!!onAddNew && (
+                  <MDButton size="small" variant="contained" color="white" onClick={onAddNew}>
+                    <Icon>add</Icon>&nbsp;Add New
+                  </MDButton>
+                )}
               </MDTypography>
             </MDBox>
             <MDBox pt={3}>

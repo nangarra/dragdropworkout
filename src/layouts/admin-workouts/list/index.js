@@ -1,6 +1,5 @@
-import { Card, Grid, Icon, Input, Skeleton, Tooltip } from "@mui/material";
+import { Card, Grid, Icon, Tooltip } from "@mui/material";
 import Confirmation from "components/Confirmation";
-import Loading from "components/Loading";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
@@ -8,7 +7,7 @@ import dayjs from "dayjs";
 import DataTable from "examples/Tables/DataTable";
 import { useTitleCase } from "hooks";
 import _ from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import StarRatings from "react-star-ratings";
 import { deleteWorkout } from "services/workouts";
 import { getWorkouts } from "services/workouts";
@@ -123,7 +122,7 @@ const WorkoutList = () => {
   const columns = useMemo(() => cols, columnHeaders);
 
   return (
-    <MDBox pt={4} pb={3}>
+    <MDBox p={2}>
       <Confirmation
         loading={deleting}
         open={confirm}

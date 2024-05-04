@@ -49,6 +49,8 @@ const ExerciseList = (props) => {
   const [deleting, setDeleting] = useState(false);
   const [deleteExerciseId, setDeleteExerciseId] = useState(null);
 
+  const dynamicHeight = window.innerHeight - 275;
+
   useEffect(() => {
     getExercisesData();
   }, []);
@@ -92,108 +94,110 @@ const ExerciseList = (props) => {
   };
 
   return (
-    <MDBox>
-      <Confirmation
-        loading={deleting}
-        open={confirm}
-        title="Delete Exercise"
-        message="Are you sure you want to delete this exercise?"
-        onClose={closeConfirmDeleteExercise}
-        onConfirm={deleteExerciseConfirmed}
-      />
-      <Grid container spacing={3}>
-        <Loading loading={loading} customLoader={<Loader />}>
-          {noExercises && <NoExercises onOpen={onOpen} />}
-          {exercises.map((row) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              key={row.id}
-              onMouseLeave={() => setHover(null)}
-              onMouseEnter={() => setHover(row.id)}
-            >
-              <motion.div
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                whileHover={{ scale: 1.05 }}
+    <div style={{ overflowY: "auto", maxHeight: dynamicHeight }}>
+      <MDBox p={2}>
+        <Confirmation
+          loading={deleting}
+          open={confirm}
+          title="Delete Exercise"
+          message="Are you sure you want to delete this exercise?"
+          onClose={closeConfirmDeleteExercise}
+          onConfirm={deleteExerciseConfirmed}
+        />
+        <Grid container spacing={3}>
+          <Loading loading={loading} customLoader={<Loader />}>
+            {noExercises && <NoExercises onOpen={onOpen} />}
+            {exercises.map((row) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+                key={row.id}
+                onMouseLeave={() => setHover(null)}
+                onMouseEnter={() => setHover(row.id)}
               >
-                <Paper
-                  variant="outlined"
-                  className="cursor-pointer hover:shadow-md relative overflow-hidden"
-                  style={{ borderRadius: 8 }}
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
                 >
-                  <div className="flex items-center justify-center h-[160px] border-b border-gray-300 overflow-hidden">
-                    <img
-                      src={row.thumbnail || "/img/no-image.png"}
-                      className={`w-1/3 sm:w-1/2 lg:w-1/3 h-fit object-cover ${
-                        row.thumbnail ? "" : "opacity-50"
-                      }`}
-                    />
-                  </div>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: hover === row.id ? "auto" : 0 }}
-                    className="absolute top-0 right-0 grid w-full h-[159px] justify-end overflow-hidden z-50 bg-white"
+                  <Paper
+                    variant="outlined"
+                    className="cursor-pointer hover:shadow-md relative overflow-hidden"
+                    style={{ borderRadius: 8 }}
                   >
-                    <div className="flex flex-col items-center gap-2 p-2">
-                      <Tooltip title="Edit" placement="right">
-                        <Icon
-                          onClick={() => editExercise(row)}
-                          className="text-gray-400 hover:text-blue-400"
-                        >
-                          edit
-                        </Icon>
-                      </Tooltip>
-                      <Tooltip title="Delete" placement="right">
-                        <Icon
-                          onClick={() => confirmDeleteExercise(row.id)}
-                          className="text-gray-400 hover:text-red-400"
-                        >
-                          delete_forever
-                        </Icon>
-                      </Tooltip>
+                    <div className="flex items-center justify-center h-[160px] border-b border-gray-300 overflow-hidden">
+                      <img
+                        src={row.thumbnail || "/img/no-image.png"}
+                        className={`w-1/3 sm:w-1/2 lg:w-1/3 h-fit object-cover ${
+                          row.thumbnail ? "" : "opacity-50"
+                        }`}
+                      />
                     </div>
-                  </motion.div>
-                  <div className="py-2 px-4">
-                    <Typography
-                      gutterBottom
-                      variant="p"
-                      component="div"
-                      className="flex items-center justify-between text-sm font-semibold"
-                    >
-                      <span>{row.title}</span>
-                    </Typography>
-
                     <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: hover === row.id ? "auto" : 0 }}
-                      className="overflow-hidden"
+                      initial={{ width: 0 }}
+                      animate={{ width: hover === row.id ? "auto" : 0 }}
+                      className="absolute top-0 right-0 grid w-full h-[159px] justify-end overflow-hidden z-50 bg-white"
                     >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {row.description}
-                      </Typography>
+                      <div className="flex flex-col items-center gap-2 p-2">
+                        <Tooltip title="Edit" placement="right">
+                          <Icon
+                            onClick={() => editExercise(row)}
+                            className="text-gray-400 hover:text-blue-400"
+                          >
+                            edit
+                          </Icon>
+                        </Tooltip>
+                        <Tooltip title="Delete" placement="right">
+                          <Icon
+                            onClick={() => confirmDeleteExercise(row.id)}
+                            className="text-gray-400 hover:text-red-400"
+                          >
+                            delete_forever
+                          </Icon>
+                        </Tooltip>
+                      </div>
                     </motion.div>
-                  </div>
-                </Paper>
-              </motion.div>
-            </Grid>
-          ))}
-        </Loading>
-      </Grid>
-    </MDBox>
+                    <div className="py-2 px-4">
+                      <Typography
+                        gutterBottom
+                        variant="p"
+                        component="div"
+                        className="flex items-center justify-between text-sm font-semibold"
+                      >
+                        <span>{row.title}</span>
+                      </Typography>
+
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: hover === row.id ? "auto" : 0 }}
+                        className="overflow-hidden"
+                      >
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {row.description}
+                        </Typography>
+                      </motion.div>
+                    </div>
+                  </Paper>
+                </motion.div>
+              </Grid>
+            ))}
+          </Loading>
+        </Grid>
+      </MDBox>
+    </div>
   );
 };
 

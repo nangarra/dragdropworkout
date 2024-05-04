@@ -20,7 +20,7 @@ import _ from "lodash";
 import { useEffect, useState } from "react";
 import { saveExercise } from "services/exercises";
 
-const style = { width: 600 };
+const style = { width: "92%", maxWidth: 600 };
 
 const DEFAULT_VALUES = { title: null, description: null, discipline: [], thumbnail: null };
 

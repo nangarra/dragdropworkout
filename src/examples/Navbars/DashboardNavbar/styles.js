@@ -22,7 +22,8 @@ function navbar(theme, ownerState) {
   const { borderRadius } = borders;
 
   return {
-    boxShadow: transparentNavbar || absolute ? "none" : navbarBoxShadow,
+    // boxShadow: transparentNavbar || absolute ? "none" : navbarBoxShadow,
+    boxShadow: "none",
     backdropFilter: transparentNavbar || absolute ? "none" : `saturate(200%) blur(${pxToRem(30)})`,
     backgroundColor:
       transparentNavbar || absolute
@@ -42,13 +43,15 @@ function navbar(theme, ownerState) {
 
       return color;
     },
-    top: absolute ? 0 : pxToRem(12),
+    // top: absolute ? 0 : pxToRem(12),
+    top: absolute ? 0 : pxToRem(0),
     minHeight: pxToRem(75),
     display: "grid",
-    alignItems: "center",
-    borderRadius: borderRadius.xl,
-    paddingTop: pxToRem(8),
-    paddingBottom: pxToRem(8),
+    alignItems: "start",
+    borderRadius: pxToRem(0),
+    // borderRadius: borderRadius.xl,
+    // paddingTop: pxToRem(8),
+    // paddingBottom: pxToRem(8),
     paddingRight: absolute ? pxToRem(8) : 0,
     paddingLeft: absolute ? pxToRem(16) : 0,
 

@@ -37,13 +37,13 @@ const Nutritions = () => {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar onAddNew={handleOpenNutritionForm} />
+      <DashboardNavbar />
       <NutritionForm
         open={openNutritionForm}
         nutrition={selectedNutrition}
         onClose={closeNutritionForm}
       />
-      <Filters />
+      <Filters onAddNew={handleOpenNutritionForm} />
       <NutritionList getData={getData} onOpen={handleOpenNutritionForm} />
       <Footer />
     </DashboardLayout>
