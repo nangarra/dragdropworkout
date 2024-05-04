@@ -90,7 +90,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
       }}
       open={Boolean(openMenu)}
       onClose={handleCloseMenu}
-      sx={{ mt: 2 }}
     >
       <NotificationItem icon={<Icon>person</Icon>} title={loggedInUser?.username} />
       <NotificationItem icon={<Icon>email</Icon>} title={loggedInUser?.email} />
