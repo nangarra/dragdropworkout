@@ -69,15 +69,15 @@ const NutritionForm = (props) => {
       setError((prev) => ({ ...prev, title: true }));
       errors = true;
     }
-    if (!values.calories) {
+    if (!values.calories && values.calories !== 0) {
       setError((prev) => ({ ...prev, calories: true }));
       errors = true;
     }
-    if (!values.fat) {
+    if (!values.fat && values.fat !== 0) {
       setError((prev) => ({ ...prev, fat: true }));
       errors = true;
     }
-    if (!values.protein) {
+    if (!values.protein && values.protein !== 0) {
       setError((prev) => ({ ...prev, protein: true }));
       errors = true;
     }
