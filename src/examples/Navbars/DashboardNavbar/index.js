@@ -31,6 +31,7 @@ import { Divider } from "@mui/material";
 import { TOKEN } from "constants";
 import { userSignOut } from "services/auth";
 import { LOGGED_IN_USER } from "constants";
+import MDAvatar from "components/MDAvatar";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const loggedInUser = JSON.parse(localStorage.getItem(LOGGED_IN_USER));
@@ -79,6 +80,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
     navigate("/admin/sign-in");
   };
 
+  const handleProfileClick = () => {
+    navigate("/admin/profile");
+  };
+
   // Render the notifications menu
   const renderMenu = () => (
     <Menu
@@ -93,6 +98,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
     >
       <NotificationItem icon={<Icon>person</Icon>} title={loggedInUser?.username} />
       <NotificationItem icon={<Icon>email</Icon>} title={loggedInUser?.email} />
+      <NotificationItem
+        icon={<Icon>account_circle</Icon>}
+        title="Profile"
+        onClick={handleProfileClick}
+      />
       <Divider />
       <NotificationItem icon={<Icon>logout</Icon>} title="Sign out" onClick={handleSignout} />
     </Menu>
@@ -155,7 +165,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   disableRipple
                   onClick={handleOpenMenu}
                 >
-                  <Icon sx={iconsStyle}>account_circle</Icon>
+                  <MDAvatar
+                    src={loggedInUser.profilePic}
+                    alt="profile-image"
+                    size="xs"
+                    shadow="xs"
+                  />
+                  {/* <Icon sx={iconsStyle}>account_circle</Icon> */}
                 </IconButton>
                 {renderMenu()}
               </MDBox>

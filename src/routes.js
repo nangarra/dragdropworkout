@@ -29,6 +29,18 @@ const protectedRoutes = [
     links: ["workouts"],
     component: lazy(() => import("layouts/admin-workouts/index.js")),
   },
+  {
+    type: "divider",
+  },
+  {
+    type: "collapse",
+    name: "Profile",
+    key: "profile",
+    icon: <Icon fontSize="small">account_circle</Icon>,
+    route: "/admin/profile",
+    links: ["profile"],
+    component: lazy(() => import("layouts/profile/index.js")),
+  },
 ];
 
 const publicRoutes = [

@@ -51,8 +51,8 @@ function Basic() {
     setLoading(true);
     try {
       const response = await userSignIn(values);
-      localStorage.setItem(TOKEN, response.data.token);
-      localStorage.setItem(LOGGED_IN_USER, JSON.stringify(response.data.user));
+      localStorage.setItem(TOKEN, response?.data?.token);
+      localStorage.setItem(LOGGED_IN_USER, JSON.stringify(response?.data?.user));
       navigate("/admin/exercises");
     } catch (error) {
       setToast(
@@ -86,7 +86,7 @@ function Basic() {
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <MDBox mb={2}>
               <MDInput
                 required
@@ -132,7 +132,7 @@ function Basic() {
                 {loading && <CircularProgress size={10} color="white" />}&nbsp;sign in
               </MDButton>
             </MDBox>
-          </MDBox>
+          </form>
         </MDBox>
       </Card>
     </CoverLayout>
