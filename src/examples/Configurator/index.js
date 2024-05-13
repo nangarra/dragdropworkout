@@ -78,21 +78,21 @@ function Configurator() {
     return () => window.removeEventListener("resize", handleDisabled);
   }, []);
 
-  const handleCloseConfigurator = () => setOpenConfigurator(dispatch, false);
+  const handleCloseConfigurator = () => setOpenConfigurator(dispatch, false, controller);
   const handleTransparentSidenav = () => {
-    setTransparentSidenav(dispatch, true);
-    setWhiteSidenav(dispatch, false);
+    setTransparentSidenav(dispatch, true, controller);
+    setWhiteSidenav(dispatch, false, controller);
   };
   const handleWhiteSidenav = () => {
-    setWhiteSidenav(dispatch, true);
-    setTransparentSidenav(dispatch, false);
+    setWhiteSidenav(dispatch, true, controller);
+    setTransparentSidenav(dispatch, false, controller);
   };
   const handleDarkSidenav = () => {
-    setWhiteSidenav(dispatch, false);
-    setTransparentSidenav(dispatch, false);
+    setWhiteSidenav(dispatch, false, controller);
+    setTransparentSidenav(dispatch, false, controller);
   };
-  const handleFixedNavbar = () => setFixedNavbar(dispatch, !fixedNavbar);
-  const handleDarkMode = () => setDarkMode(dispatch, !darkMode);
+  const handleFixedNavbar = () => setFixedNavbar(dispatch, !fixedNavbar, controller);
+  const handleDarkMode = () => setDarkMode(dispatch, !darkMode, controller);
 
   // sidenav type buttons styles
   const sidenavTypeButtonsStyles = ({
@@ -199,7 +199,7 @@ function Configurator() {
                     borderColor: darkMode ? white.main : dark.main,
                   },
                 })}
-                onClick={() => setSidenavColor(dispatch, color)}
+                onClick={() => setSidenavColor(dispatch, color, controller)}
               />
             ))}
           </MDBox>

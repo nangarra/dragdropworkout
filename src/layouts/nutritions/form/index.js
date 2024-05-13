@@ -35,7 +35,7 @@ const DEFAULT_VALUES = {
 
 const NutritionForm = (props) => {
   const { open, onClose, nutrition = {} } = props;
-  const [, dispatch] = useMaterialUIController();
+  const [controller, dispatch] = useMaterialUIController();
   const [errors, setError] = useState({ title: null });
   const [hover, setHover] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -95,13 +95,15 @@ const NutritionForm = (props) => {
           type="success"
           title="Success!"
           content={`Nutrition ${nutrition?.id ? "updated" : "created"}!`}
-        />
+        />,
+        controller
       );
       handleClose();
     } catch (error) {
       setToast(
         dispatch,
-        <Notification type="error" title="Something went wrong!" content={error?.message} />
+        <Notification type="error" title="Something went wrong!" content={error?.message} />,
+        controller
       );
     }
     setLoading(false);
@@ -279,7 +281,13 @@ const NutritionForm = (props) => {
           )}
         </MDBox>
         <div className="flex justify-start items-center p-4 border-t text-white gap-2">
-          <MDButton size="small" variant="gradient" color="primary" type="submit">
+          <MDButton
+            disabled={loading}
+            size="small"
+            variant="gradient"
+            color="primary"
+            type="submit"
+          >
             {loading && <CircularProgress size={10} color="white" />}&nbsp;Save
           </MDButton>
           <MDButton size="small" variant="contained" color="white" type="button" onClick={onClose}>

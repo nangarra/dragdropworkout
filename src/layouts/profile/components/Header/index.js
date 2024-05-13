@@ -22,11 +22,12 @@ import breakpoints from "assets/theme/base/breakpoints";
 // Images
 import burceMars from "assets/images/bruce-mars.jpg";
 import backgroundImage from "assets/images/bg-profile.jpeg";
-import { LOGGED_IN_USER } from "constants";
 import { NO_PROFILE_PIC } from "constants";
 import { motion } from "framer-motion";
 import { CircularProgress, IconButton } from "@mui/material";
 import { saveLoggedInUser } from "services/user";
+import { setLoggedInUser } from "context";
+import { useMaterialUIController } from "context";
 
 function Header({ children }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
@@ -34,7 +35,9 @@ function Header({ children }) {
   const [hover, setHover] = useState(false);
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState(null);
-  const loggedInUser = JSON.parse(localStorage.getItem(LOGGED_IN_USER) || "");
+
+  const [controller, dispatch] = useMaterialUIController();
+  const { loggedInUser } = controller;
 
   useEffect(() => {
     // A function that sets the orientation state of the tabs.
@@ -75,7 +78,7 @@ function Header({ children }) {
       try {
         const response = await saveLoggedInUser({ profilePic });
 
-        localStorage.setItem(LOGGED_IN_USER, JSON.stringify(response.data));
+        setLoggedInUser(dispatch, response?.data, controller);
         setAvatar(response.data.profilePic);
       } catch (error) {}
     };

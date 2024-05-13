@@ -24,21 +24,21 @@ import { IconButton } from "@mui/material";
 const SOCIALS = [
   {
     link: "",
-    icon: <FacebookIcon />,
+    icon: <FacebookIcon fontSize="small" className="fa-facebook" />,
     color: "facebook",
   },
   {
     link: "",
-    icon: <TwitterIcon />,
+    icon: <TwitterIcon fontSize="small" className="fa-x-twitter" />,
     color: "twitter",
   },
   {
     link: "",
-    icon: <InstagramIcon />,
+    icon: <InstagramIcon fontSize="small" className="fa-instagram" />,
     color: "instagram",
   },
 ];
-function ProfileInfoCard({ title, description, info, social, action, shadow }) {
+function ProfileInfoCard({ title, description, info, social = [], action, shadow }) {
   const labels = [];
   const values = [];
   const { socialMediaColors } = colors;
@@ -72,21 +72,25 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
   ));
 
   // Render the card social media icons
-  const renderSocial = social.map(({ link, name, color }) => (
-    <MDBox
-      key={color}
-      component="a"
-      href={link}
-      target="_blank"
-      rel="noreferrer"
-      fontSize={size.lg}
-      color={socialMediaColors[color].main}
-      pr={1}
-      pl={0.5}
-      lineHeight={1}
-    >
+  const renderSocial = social?.map(({ link, name, color }) => (
+    // <MDBox
+    //   key={color}
+    //   component="a"
+    //   href={link}
+    //   target="_blank"
+    //   rel="noreferrer"
+    //   fontSize={size.lg}
+    //   color={socialMediaColors[color].main}
+    //   pr={1}
+    //   pl={0.5}
+    //   lineHeight={1}
+    // >
+    //   {_.find(SOCIALS, (row) => row.color === name).icon}
+    // </MDBox>
+
+    <a href={link} className="dnd-icon rounded-md" target="_blank" rel="noreferrer">
       {_.find(SOCIALS, (row) => row.color === name).icon}
-    </MDBox>
+    </a>
   ));
 
   return (
@@ -121,7 +125,7 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
             <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
               social: &nbsp;
             </MDTypography>
-            {renderSocial}
+            <div className="dnd-wrapper">{renderSocial}</div>
           </MDBox>
         </MDBox>
       </MDBox>

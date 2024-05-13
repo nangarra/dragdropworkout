@@ -31,13 +31,17 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
     textColor = "inherit";
   }
 
-  const closeSidenav = () => setMiniSidenav(dispatch, true);
+  const closeSidenav = () => setMiniSidenav(dispatch, true, controller);
 
   useEffect(() => {
     function handleMiniSidenav() {
-      setMiniSidenav(dispatch, window.innerWidth < 1200);
-      setTransparentSidenav(dispatch, window.innerWidth < 1200 ? false : transparentSidenav);
-      setWhiteSidenav(dispatch, window.innerWidth < 1200 ? false : whiteSidenav);
+      setMiniSidenav(dispatch, window.innerWidth < 1200, controller);
+      setTransparentSidenav(
+        dispatch,
+        window.innerWidth < 1200 ? false : transparentSidenav,
+        controller
+      );
+      setWhiteSidenav(dispatch, window.innerWidth < 1200 ? true : whiteSidenav, controller);
     }
     window.addEventListener("resize", handleMiniSidenav);
     handleMiniSidenav();

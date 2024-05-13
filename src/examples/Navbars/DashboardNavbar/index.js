@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import AppBar from "@mui/material/AppBar";
@@ -30,14 +30,15 @@ import {
 import { Divider } from "@mui/material";
 import { TOKEN } from "constants";
 import { userSignOut } from "services/auth";
-import { LOGGED_IN_USER } from "constants";
 import MDAvatar from "components/MDAvatar";
+import { setLoggedInUser } from "context";
+import { NO_PROFILE_PIC } from "constants";
 
 function DashboardNavbar({ absolute, light, isMini }) {
-  const loggedInUser = JSON.parse(localStorage.getItem(LOGGED_IN_USER));
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
+  const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode, loggedInUser } =
+    controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
   const navigate = useNavigate();
@@ -52,7 +53,11 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
     // A function that sets the transparent state of the navbar.
     function handleTransparentNavbar() {
-      setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
+      setTransparentNavbar(
+        dispatch,
+        (fixedNavbar && window.scrollY === 0) || !fixedNavbar,
+        controller
+      );
     }
 
     /** 
@@ -68,20 +73,22 @@ function DashboardNavbar({ absolute, light, isMini }) {
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
-  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
+  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav, controller);
+  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator, controller);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+
+  const mainRoute = loggedInUser?.SuperUser ? "admin" : "personal-trainer";
 
   const handleSignout = async () => {
     await userSignOut();
     localStorage.removeItem(TOKEN);
-    localStorage.removeItem(LOGGED_IN_USER);
-    navigate("/admin/sign-in");
+    setLoggedInUser(dispatch, {}, controller);
+    navigate(`/sign-in`);
   };
 
   const handleProfileClick = () => {
-    navigate("/admin/profile");
+    navigate(`/${mainRoute}/profile`);
   };
 
   // Render the notifications menu
@@ -138,6 +145,20 @@ function DashboardNavbar({ absolute, light, isMini }) {
           {isMini ? null : (
             <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
               <MDBox color={light ? "white" : "inherit"}>
+                <NavLink
+                  to={`/${mainRoute}/workouts`}
+                  className={`text-[#7560C5] font-bold transition duration-300 ease-in-out uppercase text-sm mr-8`}
+                >
+                  workspace
+                </NavLink>
+
+                <NavLink
+                  to="/workout-builder"
+                  className={`text-[#7560C5] font-normal transition duration-300 ease-in-out uppercase text-sm mr-8`}
+                >
+                  workout builder
+                </NavLink>
+
                 <IconButton
                   size="medium"
                   disableRipple
@@ -149,6 +170,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     {miniSidenav ? "menu_open" : "menu"}
                   </Icon>
                 </IconButton>
+
                 <IconButton
                   size="medium"
                   disableRipple
@@ -166,7 +188,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   onClick={handleOpenMenu}
                 >
                   <MDAvatar
-                    src={loggedInUser.profilePic}
+                    src={loggedInUser?.profilePic || NO_PROFILE_PIC}
                     alt="profile-image"
                     size="xs"
                     shadow="xs"

@@ -43,29 +43,52 @@ function reducer(state, action) {
       return { ...state, darkMode: action.value };
     }
     case "TOAST": {
-      return { ...state, toast: [...state.toast, action.value] };
+      return { ...state, toast: [action.value] };
     }
+    case "LOGGEDINUSER": {
+      return { ...state, loggedInUser: action.value };
+    }
+
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
   }
 }
 
+const STATES = {
+  MINI_SIDENAV: "miniSidenav",
+  TRANSPARENT_SIDENAV: "transparentSidenav",
+  WHITE_SIDENAV: "whiteSidenav",
+  SIDENAV_COLOR: "sidenavColor",
+  TRANSPARENT_NAVBAR: "transparentNavbar",
+  FIXED_NAVBAR: "fixedNavbar",
+  OPEN_CONFIGURATOR: "openConfigurator",
+  DIRECTION: "direction",
+  LAYOUT: "layout",
+  TOAST: "toast",
+  DARKMODE: "darkMode",
+  LOGGEDINUSER: "loggedInUser",
+};
+
 // Material Dashboard 2 React context provider
 function MaterialUIControllerProvider({ children }) {
-  const initialState = {
-    miniSidenav: false,
-    transparentSidenav: false,
-    whiteSidenav: true,
-    sidenavColor: "primary",
-    transparentNavbar: true,
-    fixedNavbar: true,
-    openConfigurator: false,
-    direction: "ltr",
-    layout: "page",
-    toast: [],
-    darkMode: false,
-  };
+  const state = localStorage.getItem("CONTROLLER");
+  const initialState = state
+    ? JSON.parse(state)
+    : {
+        miniSidenav: false,
+        transparentSidenav: false,
+        whiteSidenav: true,
+        sidenavColor: "primary",
+        transparentNavbar: true,
+        fixedNavbar: true,
+        openConfigurator: false,
+        direction: "ltr",
+        layout: "page",
+        toast: [],
+        darkMode: false,
+        loggedInUser: {},
+      };
 
   const [controller, dispatch] = useReducer(reducer, initialState);
 
@@ -92,18 +115,42 @@ MaterialUIControllerProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+const persist = (state, dispatch, controller) => {
+  dispatch(state);
+
+  if (STATES[state.type] === "toast") {
+    controller[STATES[state.type]] = [...controller.toast, state.value];
+  } else {
+    controller[STATES[state.type]] = state.value;
+  }
+
+  localStorage.setItem("CONTROLLER", JSON.stringify(controller));
+};
+
 // Context module functions
-const setMiniSidenav = (dispatch, value) => dispatch({ type: "MINI_SIDENAV", value });
-const setTransparentSidenav = (dispatch, value) => dispatch({ type: "TRANSPARENT_SIDENAV", value });
-const setWhiteSidenav = (dispatch, value) => dispatch({ type: "WHITE_SIDENAV", value });
-const setSidenavColor = (dispatch, value) => dispatch({ type: "SIDENAV_COLOR", value });
-const setTransparentNavbar = (dispatch, value) => dispatch({ type: "TRANSPARENT_NAVBAR", value });
-const setFixedNavbar = (dispatch, value) => dispatch({ type: "FIXED_NAVBAR", value });
-const setOpenConfigurator = (dispatch, value) => dispatch({ type: "OPEN_CONFIGURATOR", value });
-const setDirection = (dispatch, value) => dispatch({ type: "DIRECTION", value });
-const setLayout = (dispatch, value) => dispatch({ type: "LAYOUT", value });
-const setDarkMode = (dispatch, value) => dispatch({ type: "DARKMODE", value });
+const setMiniSidenav = (dispatch, value, controller) =>
+  persist({ type: "MINI_SIDENAV", value }, dispatch, controller);
+const setTransparentSidenav = (dispatch, value, controller) =>
+  persist({ type: "TRANSPARENT_SIDENAV", value }, dispatch, controller);
+const setWhiteSidenav = (dispatch, value, controller) =>
+  persist({ type: "WHITE_SIDENAV", value }, dispatch, controller);
+const setSidenavColor = (dispatch, value, controller) =>
+  persist({ type: "SIDENAV_COLOR", value }, dispatch, controller);
+const setTransparentNavbar = (dispatch, value, controller) =>
+  persist({ type: "TRANSPARENT_NAVBAR", value }, dispatch, controller);
+const setFixedNavbar = (dispatch, value, controller) =>
+  persist({ type: "FIXED_NAVBAR", value }, dispatch, controller);
+const setOpenConfigurator = (dispatch, value, controller) =>
+  persist({ type: "OPEN_CONFIGURATOR", value }, dispatch, controller);
+const setDirection = (dispatch, value, controller) =>
+  persist({ type: "DIRECTION", value }, dispatch, controller);
+const setLayout = (dispatch, value, controller) =>
+  persist({ type: "LAYOUT", value }, dispatch, controller);
+const setDarkMode = (dispatch, value, controller) =>
+  persist({ type: "DARKMODE", value }, dispatch, controller);
 const setToast = (dispatch, value) => dispatch({ type: "TOAST", value });
+const setLoggedInUser = (dispatch, value, controller) =>
+  persist({ type: "LOGGEDINUSER", value }, dispatch, controller);
 
 export {
   MaterialUIControllerProvider,
@@ -119,4 +166,5 @@ export {
   setLayout,
   setDarkMode,
   setToast,
+  setLoggedInUser,
 };

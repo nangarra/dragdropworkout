@@ -9,6 +9,13 @@ export async function saveLoggedInUser(data) {
   });
 }
 
+export async function getUser(id) {
+  return ApiService.fetchData({
+    url: `${PRIFIX}/get-user/${id}`,
+    method: "get",
+  });
+}
+
 export async function updatePassword(data) {
   return ApiService.fetchData({
     url: `${PRIFIX}/update-password`,

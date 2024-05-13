@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import { updatePassword } from "services/user";
 
 const UpdatePassword = ({ title }) => {
-  const [, dispatch] = useMaterialUIController();
+  const [controller, dispatch] = useMaterialUIController();
 
   const [values, setValues] = useState({
     currentPassword: null,
@@ -70,7 +70,8 @@ const UpdatePassword = ({ title }) => {
       onCancel();
       setToast(
         dispatch,
-        <Notification type="success" title="Success!" content="Password updated!" />
+        <Notification type="success" title="Success!" content="Password updated!" />,
+        controller
       );
     } catch (error) {
       if (error?.response?.data?.message) {
@@ -80,7 +81,8 @@ const UpdatePassword = ({ title }) => {
       }
       setToast(
         dispatch,
-        <Notification type="error" title="Something went wrong!" content={error?.message} />
+        <Notification type="error" title="Something went wrong!" content={error?.message} />,
+        controller
       );
     }
     setLoading(false);
@@ -155,7 +157,13 @@ const UpdatePassword = ({ title }) => {
               >
                 Cancel
               </MDButton>
-              <MDButton size="small" variant="gradient" color="primary" type="submit">
+              <MDButton
+                disabled={loading}
+                size="small"
+                variant="gradient"
+                color="primary"
+                type="submit"
+              >
                 {loading && <CircularProgress size={10} color="white" />}&nbsp;Save
               </MDButton>
             </div>

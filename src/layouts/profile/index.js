@@ -30,13 +30,14 @@ import team1 from "assets/images/team-1.jpg";
 import team2 from "assets/images/team-2.jpg";
 import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
-import { LOGGED_IN_USER } from "constants";
 import EditProfile from "./components/EditProfile";
 import { useState } from "react";
 import UpdatePassword from "./components/UpdatePassword";
+import { useMaterialUIController } from "context";
 
 function Overview() {
-  const loggedInUser = JSON.parse(localStorage.getItem(LOGGED_IN_USER));
+  const [controller, dispatch] = useMaterialUIController();
+  const { loggedInUser } = controller;
 
   const [openEditProfile, setOpenEditProfile] = useState(false);
 

@@ -1,7 +1,7 @@
 import ApiService from "./ApiService";
-const PRIFIX = "workouts";
+const PRIFIX = "trainers";
 
-export async function getWorkouts(options = {}) {
+export async function getTrainers(options = {}) {
   const params = new URLSearchParams(options);
   return ApiService.fetchData({
     url: `${PRIFIX}/get-all?${params}`,
@@ -9,21 +9,21 @@ export async function getWorkouts(options = {}) {
   });
 }
 
-export async function getWorkout(workoutId) {
+export async function getTrainer(workoutId) {
   return ApiService.fetchData({
     url: `${PRIFIX}/get-one/${workoutId}`,
     method: "get",
   });
 }
 
-export async function setWorkoutRating(workoutId, rating) {
+export async function setTrainerRating(workoutId, rating) {
   return ApiService.fetchData({
     url: `${PRIFIX}/set-rating/${workoutId}/${rating}`,
     method: "post",
   });
 }
 
-export async function createWorkout(data) {
+export async function createTrainer(data) {
   return ApiService.fetchData({
     url: `${PRIFIX}/create`,
     method: "post",
@@ -31,15 +31,7 @@ export async function createWorkout(data) {
   });
 }
 
-export async function assignWorkout(workoutId, data) {
-  return ApiService.fetchData({
-    url: `${PRIFIX}/assign-workout/${workoutId}`,
-    method: "post",
-    data,
-  });
-}
-
-export async function deleteWorkout(id) {
+export async function deleteTrainer(id) {
   return ApiService.fetchData({
     url: `${PRIFIX}/${id}`,
     method: "delete",

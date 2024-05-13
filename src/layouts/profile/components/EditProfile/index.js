@@ -18,45 +18,40 @@ import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDInput from "components/MDInput";
 import Notification from "components/Notification";
-import { COUNTRY_LIST, LOGGED_IN_USER } from "constants";
-import colors from "assets/theme/base/colors";
-import typography from "assets/theme/base/typography";
+import { COUNTRY_LIST } from "constants";
 import { setToast, useMaterialUIController } from "context";
 import { navbarIconButton } from "examples/Navbars/DashboardNavbar/styles";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { saveLoggedInUser } from "services/user";
 import MDTypography from "components/MDTypography";
+import { setLoggedInUser } from "context";
 
 const style = { width: 600 };
 
 const SOCIALS = [
   {
     link: "",
-    icon: <FacebookIcon fontSize="large" />,
+    icon: <FacebookIcon fontSize="medium" className="fa-facebook" />,
     color: "facebook",
   },
   {
     link: "",
-    icon: <TwitterIcon fontSize="large" />,
+    icon: <TwitterIcon fontSize="medium" className="fa-x-twitter" />,
     color: "twitter",
   },
   {
     link: "",
-    icon: <InstagramIcon fontSize="large" />,
+    icon: <InstagramIcon fontSize="medium" className="fa-instagram" />,
     color: "instagram",
   },
 ];
 
 const EditProfile = (props) => {
-  const { open, onClose, nutrition = {} } = props;
+  const { open, onClose } = props;
 
-  const loggedInUser = JSON.parse(localStorage.getItem(LOGGED_IN_USER));
-
-  const { socialMediaColors } = colors;
-  const { size } = typography;
-
-  const [, dispatch] = useMaterialUIController();
+  const [controller, dispatch] = useMaterialUIController();
+  const { loggedInUser } = controller;
   const [errors, setError] = useState({ username: null, email: null });
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({});
@@ -103,16 +98,18 @@ const EditProfile = (props) => {
     setLoading(true);
     try {
       const response = await saveLoggedInUser(user);
-      localStorage.setItem(LOGGED_IN_USER, JSON.stringify(response.data));
+      setLoggedInUser(dispatch, response?.data, controller);
       setToast(
         dispatch,
-        <Notification type="success" title="Success!" content="Profile updated!" />
+        <Notification type="success" title="Success!" content="Profile updated!" />,
+        controller
       );
       handleClose();
     } catch (error) {
       setToast(
         dispatch,
-        <Notification type="error" title="Something went wrong!" content={error?.message} />
+        <Notification type="error" title="Something went wrong!" content={error?.message} />,
+        controller
       );
     }
     setLoading(false);
@@ -232,14 +229,11 @@ const EditProfile = (props) => {
           {SOCIALS.map((row) => (
             <FormControl fullWidth>
               <div className="flex items-center gap-4">
-                <MDBox
-                  key={row.color}
-                  fontSize={size.lg}
-                  color={socialMediaColors[row.color].main}
-                  lineHeight={1}
-                >
-                  {row.icon}
-                </MDBox>
+                <div className="dnd-wrapper">
+                  <a href="#" className="dnd-icon rounded-md">
+                    {row.icon}
+                  </a>
+                </div>
                 <MDInput
                   fullWidth
                   type="text"
@@ -253,7 +247,13 @@ const EditProfile = (props) => {
           ))}
         </MDBox>
         <div className="flex justify-start items-center p-4 border-t text-white gap-2">
-          <MDButton size="small" variant="gradient" color="primary" type="submit">
+          <MDButton
+            disabled={loading}
+            size="small"
+            variant="gradient"
+            color="primary"
+            type="submit"
+          >
             {loading && <CircularProgress size={10} color="white" />}&nbsp;Save
           </MDButton>
           <MDButton size="small" variant="contained" color="white" type="button" onClick={onClose}>

@@ -1,5 +1,4 @@
 export const TOKEN = "TOKEN";
-export const LOGGED_IN_USER = "loggedInUser";
 export const TOKEN_TYPE = "Bearer ";
 export const REQUEST_HEADER_AUTH_KEY = "Authorization";
 export const SERVER_API = process.env.REACT_APP_SERVER_API
@@ -9,6 +8,11 @@ export const SERVER_API = process.env.REACT_APP_SERVER_API
 export const NUTRITION_TYPE = {
   PER_UNIT: "perUnit",
   PER_100_G: "per100g",
+};
+
+export const DEFAULT_ROLES = {
+  PERSONAL_TRAINER: "Personal Trainer",
+  CLIENT: "Client",
 };
 
 export const NO_PROFILE_PIC = "/img/no-profile-pic.png";

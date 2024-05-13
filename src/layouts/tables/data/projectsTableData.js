@@ -59,7 +59,7 @@ export default function data() {
       { Header: "budget", accessor: "budget", align: "left" },
       { Header: "status", accessor: "status", align: "center" },
       { Header: "completion", accessor: "completion", align: "center" },
-      { Header: "action", accessor: "action", align: "center" },
+      { Header: "actions", accessor: "action", align: "center" },
     ],
 
     rows: [
