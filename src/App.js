@@ -209,7 +209,7 @@ const AllRoutes = () => {
   return (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
-      {toast?.map?.((row) => (row ? row : <></>))}
+      {toast?.map?.((row) => (row?._store?.validated ? row : <></>))}
       {layout === "dashboard" && (
         <>
           <Sidenav
