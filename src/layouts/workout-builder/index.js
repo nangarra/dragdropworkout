@@ -680,8 +680,7 @@ const WorkoutBuilder = () => {
                 <MDBox
                   width="100%"
                   px={2}
-                  pb={1}
-                  pt={1}
+                  py={4}
                   variant="gradient"
                   bgColor="primary"
                   borderRadius="lg"
@@ -689,7 +688,7 @@ const WorkoutBuilder = () => {
                   className="flex flex-col gap-2"
                 >
                   <Input
-                    style={{ color: "white", width: "100%", fontSize: 18 }}
+                    style={{ color: "white", width: "100%", fontSize: 14 }}
                     placeholder="Search by Name, Muscle or Fitness disciplines"
                     color="secondary"
                     value={search}
@@ -700,7 +699,7 @@ const WorkoutBuilder = () => {
                       </InputAdornment>
                     }
                   />
-                  <div className="grid grid-cols-4 items-center gap-2">
+                  {/* <div className="grid grid-cols-4 items-center gap-2">
                     {selectedTab === TABS.EXERCISES &&
                       BUTTON_EXERCISE_FILTERS.map((filter) => (
                         <MDButton
@@ -726,7 +725,7 @@ const WorkoutBuilder = () => {
                           {filter}
                         </MDButton>
                       ))}
-                  </div>
+                  </div> */}
                 </MDBox>
                 <MDBox width="100%" p={2} bgColor="white" className="rounded-xl">
                   <AppBar position="static" className="mb-2">
