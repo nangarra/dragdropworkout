@@ -20,7 +20,7 @@ import _ from "lodash";
 import { useEffect, useState } from "react";
 import { saveExercise } from "services/exercises";
 
-const style = { width: 600 };
+const style = { width: "92%", maxWidth: 600 };
 
 const DEFAULT_VALUES = { title: null, description: null, discipline: [], thumbnail: null };
 
@@ -85,7 +85,7 @@ const CustomChipSelect = ({ value, onChange, errors }) => {
 
 const ExerciseForm = (props) => {
   const { open, onClose, exercise = {} } = props;
-  const [, dispatch] = useMaterialUIController();
+  const [controller, dispatch] = useMaterialUIController();
   const [errors, setError] = useState({ title: null });
   const [hover, setHover] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -141,13 +141,15 @@ const ExerciseForm = (props) => {
           type="success"
           title="Success!"
           content={`Exercise ${exercise?.id ? "updated" : "created"}!`}
-        />
+        />,
+        controller
       );
       handleClose();
     } catch (error) {
       setToast(
         dispatch,
-        <Notification type="error" title="Something went wrong!" content={error?.message} />
+        <Notification type="error" title="Something went wrong!" content={error?.message} />,
+        controller
       );
     }
     setLoading(false);
@@ -277,6 +279,7 @@ const ExerciseForm = (props) => {
             color="primary"
             type="button"
             onClick={handleSubmit}
+            disabled={loading}
           >
             {loading && <CircularProgress size={10} color="white" />}&nbsp;Save
           </MDButton>

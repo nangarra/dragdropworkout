@@ -16,3 +16,11 @@ export async function userSignOut(data) {
     data,
   });
 }
+
+export async function userSignUp(data) {
+  return ApiService.fetchData({
+    url: `${PRIFIX}/sign-up`,
+    method: "post",
+    data,
+  });
+}

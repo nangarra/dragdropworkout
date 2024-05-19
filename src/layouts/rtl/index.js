@@ -41,14 +41,14 @@ import OrdersOverview from "layouts/rtl/components/OrdersOverview";
 import { useMaterialUIController, setDirection } from "context";
 
 function RTL() {
-  const [, dispatch] = useMaterialUIController();
+  const [controller, dispatch] = useMaterialUIController();
   const { sales, tasks } = reportsLineChartData;
 
   // Changing the direction to rtl
   useEffect(() => {
-    setDirection(dispatch, "rtl");
+    setDirection(dispatch, "rtl", controller);
 
-    return () => setDirection(dispatch, "ltr");
+    return () => setDirection(dispatch, "ltr", controller);
   }, []);
 
   return (

@@ -18,40 +18,127 @@
   border: 6px solid #7560c5;
   animation: l20-1 0.8s infinite linear alternate, l20-2 1.6s infinite linear;
 }
+
 @keyframes l20-1 {
   0% {
     clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%);
   }
+
   12.5% {
     clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 0%);
   }
+
   25% {
     clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%);
   }
+
   50% {
     clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%);
   }
+
   62.5% {
     clip-path: polygon(50% 50%, 100% 0, 100% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%);
   }
+
   75% {
     clip-path: polygon(50% 50%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 50% 100%, 0% 100%);
   }
+
   100% {
     clip-path: polygon(50% 50%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 0% 100%);
   }
 }
+
 @keyframes l20-2 {
   0% {
     transform: scaleY(1) rotate(0deg);
   }
+
   49.99% {
     transform: scaleY(1) rotate(135deg);
   }
+
   50% {
     transform: scaleY(-1) rotate(0deg);
   }
+
   100% {
     transform: scaleY(-1) rotate(-135deg);
   }
 }
+
+
+/* -------------------------- Social Icons */
+
+.dnd-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dnd-icon {
+  width: 1.625rem;
+  height: 1.625rem;
+  background-color: #FFF;
+  color: #7560c5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.dnd-icon:hover>svg {
+  scale: 1.05;
+  color: #f1f1f1;
+}
+
+.dnd-icon:before {
+  background: var(--color);
+  content: "";
+  position: absolute;
+  width: 130%;
+  height: 130%;
+  left: -110%;
+  top: 80%;
+  transform: rotate(45deg);
+}
+
+.dnd-icon:hover:before {
+  animation: slide 0.7s forwards;
+}
+
+@keyframes slide {
+  50% {
+    left: 10%;
+    top: -40%;
+  }
+
+  100% {
+    left: -15%;
+    top: -15%;
+  }
+}
+
+.dnd-icon:has(.fa-instagram) {
+  --color: linear-gradient(45deg, #f9ce34, #ee2a7b, #6228d7);
+}
+
+.dnd-icon:has(.fa-facebook) {
+  --color: #1395dc;
+}
+
+.dnd-icon:has(.fa-youtube) {
+  --color: #ff0000;
+}
+
+.dnd-icon:has(.fa-x-twitter) {
+  --color: #1da1f2;
+}
+
+.dnd-icon:has(.fa-github) {
+  --color: #333;
+}
+
+/* -------------------------- Social Icons */

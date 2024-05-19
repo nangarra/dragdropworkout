@@ -35,7 +35,7 @@ const Cover = ({ image }) => (
 function CoverLayout({ coverHeight, image, children }) {
   return (
     <PageLayout>
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2" style={{ height: coverHeight }}>
         <div className="relative h-full hidden md:block">
           <div className="absolute top-0 w-full p-4">
             <NavLink to="/">
@@ -47,7 +47,7 @@ function CoverLayout({ coverHeight, image, children }) {
             </NavLink>
           </div>
           <MDBox
-            minHeight="100vh"
+            minHeight={coverHeight}
             sx={{
               backgroundImage: ({ functions: { linearGradient, rgba }, palette: { gradients } }) =>
                 image &&
@@ -66,7 +66,9 @@ function CoverLayout({ coverHeight, image, children }) {
         <div className="absolute block md:hidden top-0 right-0 bottom-0 left-0 w-full h-full">
           <Cover image={image} />
         </div>
-        <div className="grid items-center h-[100vh] w-full justify-center col-span-2 md:col-span-1">
+        <div
+          className={`grid items-center h-[${coverHeight}] w-full justify-center col-span-2 md:col-span-1`}
+        >
           {children}
         </div>
       </div>
@@ -76,7 +78,7 @@ function CoverLayout({ coverHeight, image, children }) {
 
 // Setting default props for the CoverLayout
 CoverLayout.defaultProps = {
-  coverHeight: "35vh",
+  coverHeight: "100vh",
 };
 
 // Typechecking props for the CoverLayout

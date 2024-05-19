@@ -1,10 +1,13 @@
 import {
   AppBar,
+  Box,
+  Button,
   Grid,
   Icon,
   IconButton,
   Input,
   InputAdornment,
+  Modal,
   Tab,
   Tabs,
   Typography,
@@ -18,7 +21,7 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import _ from "lodash";
 import { useEffect, useState } from "react";
 import { DragDropContext } from "react-beautiful-dnd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getExercises } from "services/exercises";
 import { getNutritions } from "services/nutritions";
 import { createWorkout } from "services/workouts";
@@ -27,6 +30,8 @@ import ExercisesList from "./list/exercises";
 import NutritionsList from "./list/nutritions";
 import SelectedExercises from "./list/selectedExercises";
 import MDButton from "components/MDButton";
+import { getWorkout } from "services/workouts";
+import SignUp from "layouts/authentication/sign-up";
 
 const INITIAL_STATE = {
   title: null,
@@ -48,11 +53,15 @@ const BUTTON_NUTRITION_FILTERS = ["protein shake", "steak", "eggs", "creatine"];
 
 const WorkoutBuilder = () => {
   const [controller, dispatch] = useMaterialUIController();
+  const { loggedInUser } = controller;
   const navigate = useNavigate();
+  const params = useParams();
 
   const [loading, setLoading] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [fetchingWorkout, setFetchingWorkout] = useState(false);
   const [fetching, setFetching] = useState(true);
-
   const [workout, setWorkout] = useState(INITIAL_STATE);
   const [titleEdit, setTitleEdit] = useState(false);
   const [descEdit, setDescEdit] = useState(false);
@@ -74,16 +83,27 @@ const WorkoutBuilder = () => {
   const [search, setSearch] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [noData, setNoData] = useState(false);
+  const [maxHeight, setMaxHeight] = useState(795);
+
+  const [register, setRegister] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
+      setMaxHeight(795 - window.scrollY);
     };
 
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (params.workoutId) {
+      setIsEdit(true);
+      getWorkoutData();
+    }
+  }, [params.workoutId]);
 
   useEffect(() => {
     setSearch("");
@@ -114,7 +134,7 @@ const WorkoutBuilder = () => {
 
   useEffect(() => {
     const body = document.body;
-    if (loading) {
+    if (loading || fetchingWorkout || updating) {
       body.style.overflow = "hidden";
     } else {
       body.style.overflow = "auto";
@@ -122,7 +142,42 @@ const WorkoutBuilder = () => {
     return () => {
       body.style.overflow = "auto";
     };
-  }, [loading]);
+  }, [loading, fetchingWorkout, updating]);
+
+  const getWorkoutData = async () => {
+    setFetchingWorkout(true);
+
+    try {
+      const response = await getWorkout(params.workoutId);
+
+      const selectedExercises = _.map(
+        response.data.SelectedExercise,
+        (row) =>
+          (row.Exercise && {
+            ...row.Exercise,
+            type: TYPES.EXERCISES,
+            sets: row.sets,
+            minutes: row.minutes,
+            seconds: row.seconds,
+            repititions: row.repititions,
+            weight: row.weight,
+          }) ||
+          (row.Nutrition && {
+            ...row.Nutrition,
+            type: TYPES.NUTRITIONS,
+            sets: row.set,
+            fat: row.fat,
+            grams: row.grams,
+            pcs: row.pcs,
+            protein: row.protein,
+          })
+      );
+      setWorkout(_.pick(response.data, ["id", "title", "description"]));
+      setSelected(selectedExercises);
+    } catch (error) {}
+
+    setFetchingWorkout(false);
+  };
 
   const getExercisesData = async (options = {}) => {
     try {
@@ -141,7 +196,8 @@ const WorkoutBuilder = () => {
     } catch (error) {
       setToast(
         dispatch,
-        <Notification type="error" title="Something went wrong!" content={error?.message} />
+        <Notification type="error" title="Something went wrong!" content={error?.message} />,
+        controller
       );
     }
     setFetching(false);
@@ -169,7 +225,8 @@ const WorkoutBuilder = () => {
     } catch (error) {
       setToast(
         dispatch,
-        <Notification type="error" title="Something went wrong!" content={error?.message} />
+        <Notification type="error" title="Something went wrong!" content={error?.message} />,
+        controller
       );
     }
 
@@ -182,8 +239,13 @@ const WorkoutBuilder = () => {
     setSelected([]);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (update) => {
+    if (update && !isEdit && !loggedInUser?.id) {
+      setRegister(true);
+      return;
+    }
     let error = false;
+    const loader = update ? setUpdating : setLoading;
     if (!workout.title) {
       setError((prev) => ({ ...prev, title: true }));
       error = true;
@@ -201,15 +263,18 @@ const WorkoutBuilder = () => {
 
     if (error) return;
 
-    setLoading(true);
+    loader(true);
     try {
       workout.selected = selected;
+      if (loggedInUser?.id) {
+        workout.createdBy = loggedInUser?.id;
+      }
       const response = await createWorkout(workout);
       navigate(`/workouts/${useTitleCase(response.data.title)}`);
     } catch (error) {
       if (error?.response?.data?.message === "501") {
         setError((prev) => ({ ...prev, "unique-title": true }));
-        setLoading(false);
+        loader(false);
         return;
       }
       setToast(
@@ -218,10 +283,11 @@ const WorkoutBuilder = () => {
           type="error"
           title="Something went wrong!"
           content={error?.response?.data?.message || error?.message}
-        />
+        />,
+        controller
       );
     }
-    setLoading(false);
+    loader(false);
   };
 
   const handleWorkoutChange = (e) => {
@@ -386,9 +452,13 @@ const WorkoutBuilder = () => {
     setButtonFilters(discFilters);
   };
 
+  const myDiv = document.getElementById("side");
+  const sideWidth = myDiv?.offsetWidth;
+
   return (
     <BasicLayout>
-      {loading && (
+      <SignUp open={register} close={() => setRegister(false)} />
+      {(loading || fetchingWorkout || updating) && (
         <div className="fixed bg-black/20 top-0 right-0 bottom-0 left-0 flex items-center justify-center h-full w-full z-50">
           <MDBox
             width="auto"
@@ -405,11 +475,13 @@ const WorkoutBuilder = () => {
               color="primary"
               className="flex items-center justify-center gap-2"
             >
-              <div className="loader"></div>Creating Workout
+              <div className="loader"></div>
+              {fetchingWorkout ? "Fetching" : updating ? "Updating" : "Creating"} Workout
             </Typography>
           </MDBox>
         </div>
       )}
+
       <EditForm open={showEditModal} onClose={handleClose} data={editData} onSubmit={handleEdit} />
       <div className="container mx-auto">
         <Grid container spacing={2}>
@@ -425,9 +497,9 @@ const WorkoutBuilder = () => {
                           <Input
                             name="title"
                             className="w-full"
+                            value={workout.title}
                             style={{ fontSize: 30 }}
                             placeholder="Workout Title"
-                            value={workout.title}
                             onChange={handleWorkoutChange}
                             autoFocus
                             onBlur={() => setTitleEdit(false)}
@@ -524,27 +596,51 @@ const WorkoutBuilder = () => {
                   </Grid>
                   <Grid item xs={3}>
                     <div className="flex flex-col justify-center items-end h-full gap-2">
-                      <div className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer">
-                        <IconButton
-                          color="primary"
-                          aria-label="Add"
-                          onClick={handleSubmit}
-                          className="flex items-center gap-1"
+                      {!isEdit && (
+                        <div
+                          className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer"
+                          onClick={() => handleSubmit(false)}
                         >
-                          <Icon fontSize="small">send</Icon>
-                          <b className="text-sm">Save & Send Workout</b>
-                        </IconButton>
-                      </div>
-                      <div className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer">
-                        <IconButton
-                          color="primary"
-                          aria-label="Add"
+                          <IconButton
+                            color="primary"
+                            aria-label="Add"
+                            className="flex items-center gap-1"
+                          >
+                            <Icon fontSize="small">send</Icon>
+                            <b className="text-sm">Create & Send Workout</b>
+                          </IconButton>
+                        </div>
+                      )}
+                      <div className="flex w-full items-center gap-2">
+                        {(workout.id || !loggedInUser?.id) && (
+                          <div
+                            className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer"
+                            onClick={() => handleSubmit(true)}
+                          >
+                            <IconButton
+                              color="primary"
+                              aria-label="Add"
+                              className="flex items-center gap-1"
+                            >
+                              <Icon fontSize="small">save</Icon>
+                              <b className="text-sm">Save</b>
+                            </IconButton>
+                          </div>
+                        )}
+
+                        <div
+                          className="border rounded-lg border-[#7560C5] bg-white w-full flex justify-center cursor-pointer"
                           onClick={handleClearSelected}
-                          className="flex items-center gap-1"
                         >
-                          <Icon fontSize="small">delete_outline</Icon>
-                          <b className="text-sm">Clear Workout</b>
-                        </IconButton>
+                          <IconButton
+                            color="primary"
+                            aria-label="Add"
+                            className="flex items-center gap-1"
+                          >
+                            <Icon fontSize="small">delete_outline</Icon>
+                            <b className="text-sm">Clear</b>
+                          </IconButton>
+                        </div>
                       </div>
                       {/* <Tooltip title="Save">
                         <div className="border rounded-full border-[#7560C5] bg-white">
@@ -571,80 +667,74 @@ const WorkoutBuilder = () => {
 
             {/* --------------- Exercises & Nutritions */}
             <Grid item xs={4}>
-              <div className="flex flex-col gap-5 relative">
-                <div
-                  style={{
-                    position: isScrolled ? "fixed" : null,
-                    zIndex: isScrolled ? 40 : null,
-                    top: isScrolled ? 73 : null,
-                  }}
-                >
-                  <MDBox
-                    width="100%"
-                    px={isScrolled ? 1 : 2}
-                    pb={1}
-                    pt={1}
-                    variant="gradient"
-                    bgColor="primary"
-                    borderRadius="lg"
-                    coloredShadow="primary"
-                    className="flex flex-col gap-2"
-                  >
-                    <Input
-                      style={{ color: "white", width: "100%", fontSize: 18 }}
-                      placeholder="Search by Name, Muscle or Fitness disciplines"
-                      color="secondary"
-                      value={search}
-                      onChange={handleSearchChange}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <Icon className="text-white">search</Icon>
-                        </InputAdornment>
-                      }
-                    />
-                    <div className="grid grid-cols-4 items-center gap-2">
-                      {selectedTab === TABS.EXERCISES &&
-                        BUTTON_EXERCISE_FILTERS.map((filter) => (
-                          <MDButton
-                            size="small"
-                            variant={buttonFilters.includes(filter) ? "contained" : "text"}
-                            color="white"
-                            name={filter}
-                            onClick={handleDisciplineFilter}
-                          >
-                            {filter}
-                          </MDButton>
-                        ))}
-
-                      {selectedTab === TABS.NUTRITIONS &&
-                        BUTTON_NUTRITION_FILTERS.map((filter) => (
-                          <MDButton
-                            size="small"
-                            variant={buttonFilters.includes(filter) ? "contained" : "text"}
-                            color="white"
-                            name={filter}
-                            onClick={handleDisciplineFilter}
-                          >
-                            {filter}
-                          </MDButton>
-                        ))}
-                    </div>
-                  </MDBox>
-                </div>
+              <div
+                id="side"
+                className="flex flex-col gap-5 relative"
+                style={{
+                  position: isScrolled ? "fixed" : null,
+                  zIndex: isScrolled ? 40 : null,
+                  top: isScrolled ? 100 : null,
+                  width: isScrolled ? sideWidth : "auto",
+                }}
+              >
                 <MDBox
                   width="100%"
-                  p={2}
-                  bgColor="white"
-                  className="rounded-xl"
-                  mt={isScrolled ? 14 : 0}
+                  px={2}
+                  py={4}
+                  variant="gradient"
+                  bgColor="primary"
+                  borderRadius="lg"
+                  coloredShadow="primary"
+                  className="flex flex-col gap-2"
                 >
+                  <Input
+                    style={{ color: "white", width: "100%", fontSize: 14 }}
+                    placeholder="Search by Name, Muscle or Fitness disciplines"
+                    color="secondary"
+                    value={search}
+                    onChange={handleSearchChange}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Icon className="text-white">search</Icon>
+                      </InputAdornment>
+                    }
+                  />
+                  {/* <div className="grid grid-cols-4 items-center gap-2">
+                    {selectedTab === TABS.EXERCISES &&
+                      BUTTON_EXERCISE_FILTERS.map((filter) => (
+                        <MDButton
+                          size="small"
+                          variant={buttonFilters.includes(filter) ? "contained" : "text"}
+                          color="white"
+                          name={filter}
+                          onClick={handleDisciplineFilter}
+                        >
+                          {filter}
+                        </MDButton>
+                      ))}
+
+                    {selectedTab === TABS.NUTRITIONS &&
+                      BUTTON_NUTRITION_FILTERS.map((filter) => (
+                        <MDButton
+                          size="small"
+                          variant={buttonFilters.includes(filter) ? "contained" : "text"}
+                          color="white"
+                          name={filter}
+                          onClick={handleDisciplineFilter}
+                        >
+                          {filter}
+                        </MDButton>
+                      ))}
+                  </div> */}
+                </MDBox>
+                <MDBox width="100%" p={2} bgColor="white" className="rounded-xl">
                   <AppBar position="static" className="mb-2">
                     <Tabs orientation="horizontal" value={selectedTab} onChange={handleTabChange}>
                       <Tab label="Exercises" />
                       <Tab label="Nutritions" />
                     </Tabs>
                   </AppBar>
-                  <div className={`overflow-y-auto max-h-[795px] pb-2`}>
+                  <div className={`overflow-y-auto pb-2`} style={{ maxHeight }}>
                     {selectedTab === TABS.EXERCISES && (
                       <ExercisesList
                         noData={noData}

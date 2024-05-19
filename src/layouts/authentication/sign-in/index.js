@@ -18,14 +18,16 @@ import MDTypography from "components/MDTypography";
 // Images
 import bgImage from "assets/images/basic-bg.jpg";
 import Notification from "components/Notification";
-import { LOGGED_IN_USER, TOKEN } from "constants";
+import { TOKEN } from "constants";
 import { setToast, useMaterialUIController } from "context";
 import { userSignIn } from "services/auth";
 import { CircularProgress } from "@mui/material";
 import CoverLayout from "../components/CoverLayout";
+import { setLoggedInUser } from "context";
+import { DEFAULT_ROLES } from "constants";
 
 function Basic() {
-  const [, dispatch] = useMaterialUIController();
+  const [controller, dispatch] = useMaterialUIController();
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -51,9 +53,15 @@ function Basic() {
     setLoading(true);
     try {
       const response = await userSignIn(values);
-      localStorage.setItem(TOKEN, response.data.token);
-      localStorage.setItem(LOGGED_IN_USER, JSON.stringify(response.data.user));
-      navigate("/admin/exercises");
+      localStorage.setItem(TOKEN, response?.data?.token);
+      setLoggedInUser(dispatch, response?.data?.user, controller);
+
+      const path = response?.data?.user?.SuperUser
+        ? "/admin/exercises"
+        : response?.data?.user?.Role?.name === DEFAULT_ROLES.PERSONAL_TRAINER
+        ? "/personal-trainer/workouts"
+        : "/client/workouts";
+      navigate(path);
     } catch (error) {
       setToast(
         dispatch,
@@ -61,7 +69,8 @@ function Basic() {
           type="error"
           title="Something went wrong"
           content={error?.response?.data?.message || error?.message}
-        />
+        />,
+        controller
       );
     }
     setLoading(false);
@@ -86,7 +95,7 @@ function Basic() {
           </MDTypography>
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
-          <MDBox component="form" role="form" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             <MDBox mb={2}>
               <MDInput
                 required
@@ -132,7 +141,7 @@ function Basic() {
                 {loading && <CircularProgress size={10} color="white" />}&nbsp;sign in
               </MDButton>
             </MDBox>
-          </MDBox>
+          </form>
         </MDBox>
       </Card>
     </CoverLayout>

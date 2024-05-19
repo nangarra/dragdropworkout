@@ -54,6 +54,8 @@ import ProtectedRouteGuard from "guards/ProtectedRouteGuard";
 import PublicRouteGuard from "guards/PublicRouteGuard";
 import Exercises from "layouts/exercises";
 import Home from "layouts/home";
+import WorkoutBuilder from "layouts/workout-builder";
+import { DEFAULT_ROLES } from "constants";
 
 const AllRoutes = () => {
   const [controller, dispatch] = useMaterialUIController();
@@ -67,6 +69,7 @@ const AllRoutes = () => {
     whiteSidenav,
     darkMode,
     toast,
+    loggedInUser,
   } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
@@ -85,7 +88,7 @@ const AllRoutes = () => {
   // Open sidenav when mouse enter on mini sidenav
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
-      setMiniSidenav(dispatch, false);
+      setMiniSidenav(dispatch, false, controller);
       setOnMouseEnter(true);
     }
   };
@@ -93,20 +96,17 @@ const AllRoutes = () => {
   // Close sidenav when mouse leave mini sidenav
   const handleOnMouseLeave = () => {
     if (onMouseEnter) {
-      setMiniSidenav(dispatch, true);
+      setMiniSidenav(dispatch, true, controller);
       setOnMouseEnter(false);
     }
   };
 
-  // Change the openConfigurator state
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
+  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator, controller);
 
-  // Setting the dir attribute for the body element
   useEffect(() => {
     document.body.setAttribute("dir", direction);
   }, [direction]);
 
-  // Setting page scroll to 0 when changing the route
   useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -116,6 +116,33 @@ const AllRoutes = () => {
     <>
       <Route path="/admin" element={<ProtectedRouteGuard />}>
         {allRoutes.protectedRoutes.map((route, index) => {
+          const { component: Component } = route;
+
+          if (route.collapse) {
+            return getRoutes(route.collapse);
+          }
+
+          if (route.route) {
+            return <Route key={route.key} path={route.route} element={<Component />} />;
+          }
+        })}
+      </Route>
+      <Route path="/personal-trainer" element={<ProtectedRouteGuard />}>
+        {allRoutes.trainerRoutes.map((route, index) => {
+          const { component: Component } = route;
+
+          if (route.collapse) {
+            return getRoutes(route.collapse);
+          }
+
+          if (route.route) {
+            return <Route key={route.key} path={route.route} element={<Component />} />;
+          }
+        })}
+      </Route>
+
+      <Route path="/client" element={<ProtectedRouteGuard />}>
+        {allRoutes.clientRoutes.map((route, index) => {
           const { component: Component } = route;
 
           if (route.collapse) {
@@ -173,17 +200,23 @@ const AllRoutes = () => {
     </MDBox>
   );
 
+  const navigationRoutes = loggedInUser?.SuperUser
+    ? routes.protectedRoutes
+    : loggedInUser?.Role?.name === DEFAULT_ROLES.PERSONAL_TRAINER
+    ? routes.trainerRoutes
+    : routes.clientRoutes;
+
   return (
     <ThemeProvider theme={darkMode ? themeDark : theme}>
       <CssBaseline />
-      {toast?.map?.((row) => row)}
+      {toast?.map?.((row) => (row ? row : <></>))}
       {layout === "dashboard" && (
         <>
           <Sidenav
             color={sidenavColor}
             brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
             brandName="DragDropWorkout"
-            routes={routes.protectedRoutes}
+            routes={navigationRoutes}
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
@@ -195,6 +228,7 @@ const AllRoutes = () => {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/workouts/:workoutId/:id/edit" element={<WorkoutBuilder />} />
         {getRoutes(routes)}
 
         <Route path="*" element={<Navigate to="/" replace />} />

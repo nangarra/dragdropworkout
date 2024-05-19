@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect } from "react";
 
 // prop-types is a library for typechecking of props.
@@ -37,10 +22,22 @@ import breakpoints from "assets/theme/base/breakpoints";
 // Images
 import burceMars from "assets/images/bruce-mars.jpg";
 import backgroundImage from "assets/images/bg-profile.jpeg";
+import { NO_PROFILE_PIC } from "constants";
+import { motion } from "framer-motion";
+import { CircularProgress, IconButton } from "@mui/material";
+import { saveLoggedInUser } from "services/user";
+import { setLoggedInUser } from "context";
+import { useMaterialUIController } from "context";
 
 function Header({ children }) {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
-  const [tabValue, setTabValue] = useState(0);
+  // const [tabValue, setTabValue] = useState(0);
+  const [hover, setHover] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [avatar, setAvatar] = useState(null);
+
+  const [controller, dispatch] = useMaterialUIController();
+  const { loggedInUser } = controller;
 
   useEffect(() => {
     // A function that sets the orientation state of the tabs.
@@ -62,7 +59,36 @@ function Header({ children }) {
     return () => window.removeEventListener("resize", handleTabsOrientation);
   }, [tabsOrientation]);
 
-  const handleSetTabValue = (event, newValue) => setTabValue(newValue);
+  useEffect(() => {
+    setAvatar(loggedInUser?.profilePic || NO_PROFILE_PIC);
+  }, [loggedInUser]);
+
+  // const handleSetTabValue = (event, newValue) => setTabValue(newValue);
+
+  const onFileUpload = async (event) => {
+    setLoading(true);
+
+    const file = event.target.files[0];
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = async () => {
+      const profilePic = reader.result;
+      try {
+        const response = await saveLoggedInUser({ profilePic });
+
+        setLoggedInUser(dispatch, response?.data, controller);
+        setAvatar(response.data.profilePic);
+      } catch (error) {}
+    };
+
+    reader.onerror = (error) => {
+      console.error("Error converting file to base64:", error);
+    };
+
+    setLoading(false);
+  };
 
   return (
     <MDBox position="relative" mb={5}>
@@ -94,19 +120,50 @@ function Header({ children }) {
       >
         <Grid container spacing={3} alignItems="center">
           <Grid item>
-            <MDAvatar src={burceMars} alt="profile-image" size="xl" shadow="sm" />
+            <div
+              className="relative"
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+            >
+              {loading && (
+                <div className="absolute w-full h-full left-0 right-0 top-0 bottom-0 z-50 rounded-full grid h-full w-full justify-center items-center">
+                  <CircularProgress size={10} color="main" className="" />
+                </div>
+              )}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: hover ? 1 : 0 }}
+                className="absolute bg-black/20 w-full h-full left-0 right-0 top-0 bottom-0 z-50 rounded-full"
+              >
+                <div className="grid h-full w-full justify-center items-center">
+                  <label htmlFor="upload-file">
+                    <Icon className="text-white text-[25px] cursor-pointer">edit</Icon>
+                    <input
+                      hidden
+                      id="upload-file"
+                      name="thumbnail"
+                      accept="image/*"
+                      type="file"
+                      onChange={onFileUpload}
+                    />
+                  </label>
+                </div>
+              </motion.div>
+
+              <MDAvatar src={avatar} alt="profile-image" size="xl" shadow="sm" />
+            </div>
           </Grid>
           <Grid item>
             <MDBox height="100%" mt={0.5} lineHeight={1}>
               <MDTypography variant="h5" fontWeight="medium">
-                Richard Davis
+                {loggedInUser?.username}
               </MDTypography>
               <MDTypography variant="button" color="text" fontWeight="regular">
-                CEO / Co-Founder
+                {loggedInUser?.Role?.name}
               </MDTypography>
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
+          {/* <Grid item xs={12} md={6} lg={4} sx={{ ml: "auto" }}>
             <AppBar position="static">
               <Tabs orientation={tabsOrientation} value={tabValue} onChange={handleSetTabValue}>
                 <Tab
@@ -135,7 +192,7 @@ function Header({ children }) {
                 />
               </Tabs>
             </AppBar>
-          </Grid>
+          </Grid> */}
         </Grid>
         {children}
       </Card>

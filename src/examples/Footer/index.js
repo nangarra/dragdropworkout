@@ -26,8 +26,7 @@ function Footer({ company, links, className }) {
       flexDirection={{ xs: "column", lg: "row" }}
       justifyContent="space-between"
       alignItems="center"
-      px={0}
-      pt={2}
+      p={2}
     >
       <MDBox
         display="flex"

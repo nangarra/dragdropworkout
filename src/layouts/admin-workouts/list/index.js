@@ -1,17 +1,20 @@
-import { Card, Grid, Icon, Input, Skeleton, Tooltip } from "@mui/material";
+import { Card, Grid, Icon, Tooltip } from "@mui/material";
 import Confirmation from "components/Confirmation";
-import Loading from "components/Loading";
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
+import { useMaterialUIController } from "context";
 import dayjs from "dayjs";
 import DataTable from "examples/Tables/DataTable";
 import { useTitleCase } from "hooks";
 import _ from "lodash";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import StarRatings from "react-star-ratings";
 import { deleteWorkout } from "services/workouts";
 import { getWorkouts } from "services/workouts";
+import AssignedToClients from "../assigned-to-clients";
+import { DEFAULT_ROLES } from "constants";
 
 const Loader = ({ loading, children }) => {
   if (loading) {
@@ -29,12 +32,19 @@ const Loader = ({ loading, children }) => {
 };
 
 const WorkoutList = () => {
+  const [controller] = useMaterialUIController();
+  const { loggedInUser } = controller;
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirm, setConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [deleteWorkoutId, setDeleteWorkoutId] = useState(null);
   const [filter, setFilter] = useState("popular");
+  const [deleteWorkoutId, setDeleteWorkoutId] = useState(null);
+  const [selectedWorkout, setSelectedWorkout] = useState(false);
+  const [showAssignClients, setShowAssignClients] = useState(false);
+  const [assignedClients, setAssignedClients] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getWorkoutsData();
@@ -42,9 +52,19 @@ const WorkoutList = () => {
 
   const getWorkoutsData = async () => {
     setLoading(true);
-    const response = await getWorkouts({ sort: filter });
-    const data = setData(response.data);
-    setWorkouts(data);
+    const options = {};
+    options.sort = filter;
+    if (loggedInUser?.Role?.name === DEFAULT_ROLES.PERSONAL_TRAINER) {
+      options.createdBy = loggedInUser?.id;
+    }
+    if (loggedInUser?.Role?.name === DEFAULT_ROLES.CLIENT) {
+      options.assignedToMe = loggedInUser?.id;
+    }
+    try {
+      const response = await getWorkouts(options);
+      const data = setData(response.data);
+      setWorkouts(data);
+    } catch (error) {}
     setLoading(false);
   };
 
@@ -56,6 +76,7 @@ const WorkoutList = () => {
     setConfirm(false);
     setDeleteWorkoutId(null);
   };
+
   const confirmDeleteWorkout = (id) => {
     setConfirm(true);
     setDeleteWorkoutId(id);
@@ -69,18 +90,48 @@ const WorkoutList = () => {
     getWorkoutsData();
   };
 
+  const editWorkout = (workout) => {
+    navigate(`/workouts/${useTitleCase(workout.title)}/${workout.id}/edit`);
+  };
+
+  const assignToClient = (workout) => {
+    setShowAssignClients(true);
+    setSelectedWorkout(workout?.id);
+    setAssignedClients(_.map(workout?.AssignedWorkout, "clientId"));
+  };
+
+  const closeAssignedToClient = () => {
+    setShowAssignClients(false);
+    setSelectedWorkout(null);
+    setAssignedClients([]);
+  };
+
+  const handleAssignComplete = () => {
+    closeAssignedToClient();
+    getWorkoutsData();
+  };
+
   const setData = (data = []) => {
     return _.map(data, (row) => ({
       ...row,
       title: (
-        <a href={`/workouts/${useTitleCase(row.title)}`} target="_blank">
+        <a
+          href={`/workouts/${useTitleCase(row.title)}`}
+          target="_blank"
+          className="hover:text-purple-600 transition duration-300 ease-in-out"
+        >
           <b>{row.title}</b>
         </a>
       ),
-      description: <MDTypography variant="caption">{row.description}</MDTypography>,
+      // description: <MDTypography variant="caption">{row.description}</MDTypography>,
       exercises: (
         <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
           {row.SelectedExercise?.length}
+        </MDTypography>
+      ),
+      assigned: (
+        <MDTypography component="a" href="#" variant="button" color="text" fontWeight="medium">
+          {row.AssignedWorkout?.length}
         </MDTypography>
       ),
       ratingHtml: (
@@ -93,44 +144,75 @@ const WorkoutList = () => {
           name="rating"
         />
       ),
+      createdBy: row.User ? row.User?.username : "Anonymous",
       createdAt: dayjs(row.createdAt).format("MM/DD/YYYY"),
       action: (
-        <Tooltip title="Delete" placement="right">
-          <MDTypography
-            component="a"
-            href="#"
-            color="text"
-            className="text-gray-400 hover:text-red-400"
+        <div className="flex items-center gap-2">
+          {row.User && (
+            <MDButton
+              size="small"
+              variant="gradient"
+              color="primary"
+              onClick={() => assignToClient(row)}
+            >
+              Assign
+            </MDButton>
+          )}
+          <MDButton
+            size="small"
+            variant="outlined"
+            color="primary"
+            onClick={() => editWorkout(row)}
+          >
+            Edit
+          </MDButton>
+          <MDButton
+            size="small"
+            variant="gradient"
+            color="error"
             onClick={() => confirmDeleteWorkout(row.id)}
           >
-            <Icon>delete_outline</Icon>
-          </MDTypography>
-        </Tooltip>
+            Delete
+          </MDButton>
+        </div>
       ),
     }));
   };
 
-  const cols = [
-    { Header: "title", accessor: "title", width: "30%", align: "left" },
-    { Header: "description", accessor: "description", align: "left" },
+  let cols = [
+    { Header: "title", accessor: "title", width: "10%", align: "left" },
+    // { Header: "description", accessor: "description", align: "left" },
     { Header: "total exercises", accessor: "exercises", align: "left" },
+    { Header: "assigned to clients", accessor: "assigned", align: "left" },
     { Header: "rating", accessor: "ratingHtml", align: "left" },
-    { Header: "created", accessor: "createdAt", align: "left" },
-    { Header: "action", accessor: "action", align: "left" },
+    { Header: "created by", accessor: "createdBy", align: "left" },
+    { Header: "created at", accessor: "createdAt", align: "left" },
+    { Header: "actions", accessor: "action", align: "right" },
   ];
+
+  if (loggedInUser?.Role?.name === DEFAULT_ROLES.CLIENT) {
+    cols = cols.filter((row) => row.Header !== "assigned to clients" && row.Header !== "actions");
+  }
 
   const columnHeaders = _.map(cols, "Header");
   const columns = useMemo(() => cols, columnHeaders);
 
   return (
-    <MDBox pt={4} pb={3}>
+    <MDBox p={2}>
       <Confirmation
-        loading={deleting}
         open={confirm}
+        loading={deleting}
         title="Delete Workout"
         message="Are you sure you want to delete this workout?"
         onClose={closeConfirmDeleteWorkout}
         onConfirm={deleteWorkoutConfirmed}
+      />
+      <AssignedToClients
+        open={showAssignClients}
+        onClose={closeAssignedToClient}
+        workoutId={selectedWorkout}
+        assignedClients={assignedClients}
+        onFinish={handleAssignComplete}
       />
       <Grid container spacing={3}>
         <Grid item xs={12}>

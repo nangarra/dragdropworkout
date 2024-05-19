@@ -26,7 +26,13 @@ const Confirmation = (props) => {
         <MDButton size="small" variant="contained" color="white" onClick={onClose}>
           Cancel
         </MDButton>
-        <MDButton size="small" variant="gradient" color="error" onClick={onConfirm}>
+        <MDButton
+          disabled={loading}
+          size="small"
+          variant="gradient"
+          color="error"
+          onClick={onConfirm}
+        >
           {loading && <CircularProgress size={10} color="white" />}&nbsp;Confirm
         </MDButton>
       </DialogActions>

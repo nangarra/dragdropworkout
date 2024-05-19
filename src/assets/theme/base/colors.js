@@ -150,7 +150,7 @@ const colors = {
     },
 
     instagram: {
-      main: "#125688",
+      main: "#e265e2",
       dark: "#0e456d",
     },
 

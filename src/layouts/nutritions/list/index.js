@@ -50,6 +50,8 @@ const NutritionList = (props) => {
 
   const [deleteNutritionId, setDeleteNutritionId] = useState(null);
 
+  const dynamicHeight = window.innerHeight - 275;
+
   useEffect(() => {
     getNutritionsData();
   }, []);
@@ -93,80 +95,81 @@ const NutritionList = (props) => {
   };
 
   return (
-    <MDBox>
-      <Confirmation
-        loading={deleting}
-        open={confirm}
-        title="Delete Nutrition"
-        message="Are you sure you want to delete this nutrition?"
-        onClose={closeConfirmDeleteNutrition}
-        onConfirm={deleteNutritionConfirmed}
-      />
-      <Grid container spacing={3}>
-        <Loading loading={loading} customLoader={<Loader />}>
-          {noNutritions && <NoNutritions onOpen={onOpen} />}
-          {nutritions.map((row) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              key={row.id}
-              onMouseLeave={() => setHover(null)}
-              onMouseEnter={() => setHover(row.id)}
-            >
-              <motion.div
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                whileHover={{ scale: 1.05 }}
+    <div style={{ overflowY: "auto", maxHeight: dynamicHeight }}>
+      <MDBox p={2}>
+        <Confirmation
+          loading={deleting}
+          open={confirm}
+          title="Delete Nutrition"
+          message="Are you sure you want to delete this nutrition?"
+          onClose={closeConfirmDeleteNutrition}
+          onConfirm={deleteNutritionConfirmed}
+        />
+        <Grid container spacing={3}>
+          <Loading loading={loading} customLoader={<Loader />}>
+            {noNutritions && <NoNutritions onOpen={onOpen} />}
+            {nutritions.map((row) => (
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
+                key={row.id}
+                onMouseLeave={() => setHover(null)}
+                onMouseEnter={() => setHover(row.id)}
               >
-                <Paper
-                  variant="outlined"
-                  className="cursor-pointer hover:shadow-md relative overflow-hidden"
-                  style={{ borderRadius: 8 }}
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
                 >
-                  <div className="flex justify-center items-center h-[160px] border-b border-gray-300">
-                    <img
-                      src={row.thumbnail || "/img/no-image.png"}
-                      className={`w-1/3 sm:w-1/2 lg:w-1/3 h-fit object-cover ${
-                        row.thumbnail ? "" : "opacity-50"
-                      }`}
-                    />
-                  </div>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: hover === row.id ? "auto" : 0 }}
-                    className="absolute top-0 right-0 grid w-full h-[159px] justify-end overflow-hidden z-50 bg-white"
+                  <Paper
+                    variant="outlined"
+                    className="cursor-pointer hover:shadow-md relative overflow-hidden"
+                    style={{ borderRadius: 8 }}
                   >
-                    <div className="flex flex-col items-center gap-2 p-2">
-                      <Tooltip title="Edit" placement="right">
-                        <Icon
-                          onClick={() => editNutrition(row)}
-                          className="text-gray-400 hover:text-blue-400"
-                        >
-                          edit
-                        </Icon>
-                      </Tooltip>
-                      <Tooltip title="Delete" placement="right">
-                        <Icon
-                          onClick={() => confirmDeleteNutrition(row.id)}
-                          className="text-gray-400 hover:text-red-400"
-                        >
-                          delete_forever
-                        </Icon>
-                      </Tooltip>
+                    <div className="flex justify-center items-center h-[160px] border-b border-gray-300">
+                      <img
+                        src={row.thumbnail || "/img/no-image.png"}
+                        className={`w-1/3 sm:w-1/2 lg:w-1/3 h-fit object-cover ${
+                          row.thumbnail ? "" : "opacity-50"
+                        }`}
+                      />
                     </div>
-                  </motion.div>
-                  <div className="py-2 px-4">
-                    <Typography
-                      gutterBottom
-                      variant="p"
-                      component="div"
-                      className="flex items-center justify-between text-sm font-semibold"
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: hover === row.id ? "auto" : 0 }}
+                      className="absolute top-0 right-0 grid w-full h-[159px] justify-end overflow-hidden z-50 bg-white"
                     >
-                      <span>{row.title}</span>
-                      {/* <div className="flex items-center gap-2">
+                      <div className="flex flex-col items-center gap-2 p-2">
+                        <Tooltip title="Edit" placement="right">
+                          <Icon
+                            onClick={() => editNutrition(row)}
+                            className="text-gray-400 hover:text-blue-400"
+                          >
+                            edit
+                          </Icon>
+                        </Tooltip>
+                        <Tooltip title="Delete" placement="right">
+                          <Icon
+                            onClick={() => confirmDeleteNutrition(row.id)}
+                            className="text-gray-400 hover:text-red-400"
+                          >
+                            delete_forever
+                          </Icon>
+                        </Tooltip>
+                      </div>
+                    </motion.div>
+                    <div className="py-2 px-4">
+                      <Typography
+                        gutterBottom
+                        variant="p"
+                        component="div"
+                        className="flex items-center justify-between text-sm font-semibold"
+                      >
+                        <span>{row.title}</span>
+                        {/* <div className="flex items-center gap-2">
                         <Tooltip title="Edit">
                           <Icon
                             onClick={() => editNutrition(row)}
@@ -184,35 +187,36 @@ const NutritionList = (props) => {
                           </Icon>
                         </Tooltip>
                       </div> */}
-                    </Typography>
-
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: hover === row.id ? "auto" : 0 }}
-                      className="overflow-hidden"
-                    >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {row.description}
                       </Typography>
-                    </motion.div>
-                  </div>
-                </Paper>
-              </motion.div>
-            </Grid>
-          ))}
-        </Loading>
-      </Grid>
-    </MDBox>
+
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: hover === row.id ? "auto" : 0 }}
+                        className="overflow-hidden"
+                      >
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {row.description}
+                        </Typography>
+                      </motion.div>
+                    </div>
+                  </Paper>
+                </motion.div>
+              </Grid>
+            ))}
+          </Loading>
+        </Grid>
+      </MDBox>
+    </div>
   );
 };
 

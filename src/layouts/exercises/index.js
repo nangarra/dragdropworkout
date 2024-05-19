@@ -7,9 +7,6 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { useEffect, useState } from "react";
 import ExerciseForm from "./form";
 import ExerciseList from "./list";
-import MDBox from "components/MDBox";
-import MDTypography from "components/MDTypography";
-import { Card, Grid } from "@mui/material";
 import Filters from "./list/filters";
 
 const Exercises = () => {
@@ -40,13 +37,14 @@ const Exercises = () => {
 
   return (
     <DashboardLayout>
-      <DashboardNavbar onAddNew={handleOpenExerciseForm} />
+      <DashboardNavbar />
       <ExerciseForm
         open={openExerciseForm}
         exercise={selectedExercise}
         onClose={closeExerciseForm}
       />
-      <Filters />
+
+      <Filters onAddNew={handleOpenExerciseForm} />
       <ExerciseList getData={getData} onOpen={handleOpenExerciseForm} />
       <Footer />
     </DashboardLayout>

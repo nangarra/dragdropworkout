@@ -10,6 +10,8 @@ import StarRatings from "react-star-ratings";
 import { getWorkout, setWorkoutRating } from "services/workouts";
 import Loader from "./loader";
 import _ from "lodash";
+import MDAvatar from "components/MDAvatar";
+import { NO_PROFILE_PIC } from "constants";
 const MY_WORKOUT_RATINGS = "MY_WORKOUT_RATINGS";
 
 const CreatedWorkouts = () => {
@@ -89,9 +91,38 @@ const CreatedWorkouts = () => {
     <BasicLayout>
       <Loading loading={loading} customLoader={<Loader />}>
         <div className="flex flex-col gap-8 p-2">
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-4">
+            {workout?.User && (
+              <Paper className="flex justify-between items-center w-full p-4">
+                <div className="flex items-center gap-4">
+                  <MDAvatar
+                    src={workout?.User?.profilePic || NO_PROFILE_PIC}
+                    alt="profile-image"
+                    size="xl"
+                    shadow="md"
+                  />
+                  <div className="flex flex-col">
+                    <Typography variant="h4">{workout?.User?.username}</Typography>
+                    <Typography variant="h6">{workout?.User?.Role?.name}</Typography>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end text-sm">
+                  <span className="flex items-center gap-1">
+                    <Icon className="text-purple-400">email</Icon>
+                    <Typography variant="b">{workout?.User?.email || "N/A"}</Typography>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Icon className="text-purple-400">phone</Icon>
+                    <Typography variant="b">{workout?.User?.phone || "N/A"}</Typography>
+                  </span>
+                </div>
+              </Paper>
+            )}
             <div className="flex justify-between items-center">
-              <Typography variant="h3">{workout.title}</Typography>
+              <Typography variant="h3" className="max-w-[350px]">
+                {workout.title}
+              </Typography>
               <div className="flex justify-end items-center gap-2">
                 <AnimatePresence mode="wait">
                   {message && (

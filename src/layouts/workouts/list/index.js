@@ -51,7 +51,10 @@ const WorkoutList = () => {
     return _.map(data, (row) => ({
       ...row,
       title: (
-        <NavLink to={`/workouts/${useTitleCase(row.title)}`}>
+        <NavLink
+          to={`/workouts/${useTitleCase(row.title)}`}
+          className="hover:text-purple-600 transition duration-300 ease-in-out"
+        >
           <b>{row.title}</b>
         </NavLink>
       ),
@@ -61,6 +64,7 @@ const WorkoutList = () => {
           {row.SelectedExercise?.length}
         </MDTypography>
       ),
+      createdBy: row.User ? row.User?.username : "Anonymous",
       ratingHtml: (
         <StarRatings
           starDimension="20px"
@@ -81,6 +85,7 @@ const WorkoutList = () => {
     { Header: "total exercises", accessor: "exercises", align: "left" },
     { Header: "rating", accessor: "ratingHtml", align: "left" },
     { Header: "created", accessor: "createdAt", align: "left" },
+    { Header: "created by", accessor: "createdBy", align: "left" },
   ];
 
   const columnHeaders = _.map(cols, "Header");

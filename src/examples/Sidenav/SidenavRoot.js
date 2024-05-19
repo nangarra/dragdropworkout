@@ -14,6 +14,7 @@ Coded by www.creative-tim.com
 */
 
 // @mui material components
+import { BorderRight } from "@mui/icons-material";
 import Drawer from "@mui/material/Drawer";
 import { styled } from "@mui/material/styles";
 
@@ -46,8 +47,8 @@ export default styled(Drawer)(({ theme, ownerState }) => {
     }),
 
     [breakpoints.up("xl")]: {
-      boxShadow: transparentSidenav ? "none" : xxl,
-      marginBottom: transparentSidenav ? 0 : "inherit",
+      // boxShadow: transparentSidenav ? "none" : xxl,
+      // marginBottom: transparentSidenav ? 0 : "inherit",
       left: "0",
       width: sidebarWidth,
       transform: "translateX(0)",
@@ -68,8 +69,8 @@ export default styled(Drawer)(({ theme, ownerState }) => {
     }),
 
     [breakpoints.up("xl")]: {
-      boxShadow: transparentSidenav ? "none" : xxl,
-      marginBottom: transparentSidenav ? 0 : "inherit",
+      // boxShadow: transparentSidenav ? "none" : xxl,
+      // marginBottom: transparentSidenav ? 0 : "inherit",
       left: "0",
       width: pxToRem(96),
       overflowX: "hidden",
@@ -83,8 +84,12 @@ export default styled(Drawer)(({ theme, ownerState }) => {
 
   return {
     "& .MuiDrawer-paper": {
-      boxShadow: xxl,
+      // boxShadow: xxl,
       border: "none",
+      borderRight: "1px #e6e6e6 solid",
+      margin: 0,
+      borderRadius: 0,
+      height: "100vh",
 
       ...(miniSidenav ? drawerCloseStyles() : drawerOpenStyles()),
     },

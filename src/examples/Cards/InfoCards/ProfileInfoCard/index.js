@@ -1,23 +1,10 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// react-routers components
-import { Link } from "react-router-dom";
-
 // prop-types is library for typechecking of props
 import PropTypes from "prop-types";
+
+// @mui icons
+import FacebookIcon from "@mui/icons-material/Facebook";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import InstagramIcon from "@mui/icons-material/Instagram";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -32,8 +19,26 @@ import MDTypography from "components/MDTypography";
 // Material Dashboard 2 React base styles
 import colors from "assets/theme/base/colors";
 import typography from "assets/theme/base/typography";
+import { IconButton } from "@mui/material";
 
-function ProfileInfoCard({ title, description, info, social, action, shadow }) {
+const SOCIALS = [
+  {
+    link: "",
+    icon: <FacebookIcon fontSize="small" className="fa-facebook" />,
+    color: "facebook",
+  },
+  {
+    link: "",
+    icon: <TwitterIcon fontSize="small" className="fa-x-twitter" />,
+    color: "twitter",
+  },
+  {
+    link: "",
+    icon: <InstagramIcon fontSize="small" className="fa-instagram" />,
+    color: "instagram",
+  },
+];
+function ProfileInfoCard({ title, description, info, social = [], action, shadow }) {
   const labels = [];
   const values = [];
   const { socialMediaColors } = colors;
@@ -67,21 +72,25 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
   ));
 
   // Render the card social media icons
-  const renderSocial = social.map(({ link, icon, color }) => (
-    <MDBox
-      key={color}
-      component="a"
-      href={link}
-      target="_blank"
-      rel="noreferrer"
-      fontSize={size.lg}
-      color={socialMediaColors[color].main}
-      pr={1}
-      pl={0.5}
-      lineHeight={1}
-    >
-      {icon}
-    </MDBox>
+  const renderSocial = social?.map(({ link, name, color }) => (
+    // <MDBox
+    //   key={color}
+    //   component="a"
+    //   href={link}
+    //   target="_blank"
+    //   rel="noreferrer"
+    //   fontSize={size.lg}
+    //   color={socialMediaColors[color].main}
+    //   pr={1}
+    //   pl={0.5}
+    //   lineHeight={1}
+    // >
+    //   {_.find(SOCIALS, (row) => row.color === name).icon}
+    // </MDBox>
+
+    <a href={link} className="dnd-icon rounded-md" target="_blank" rel="noreferrer">
+      {_.find(SOCIALS, (row) => row.color === name).icon}
+    </a>
   ));
 
   return (
@@ -90,7 +99,12 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
         <MDTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
         </MDTypography>
-        <MDTypography component={Link} to={action.route} variant="body2" color="secondary">
+        <MDTypography
+          component={IconButton}
+          onClick={action.onClick}
+          variant="body2"
+          color="secondary"
+        >
           <Tooltip title={action.tooltip} placement="top">
             <Icon>edit</Icon>
           </Tooltip>
@@ -99,7 +113,7 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
       <MDBox p={2}>
         <MDBox mb={2} lineHeight={1}>
           <MDTypography variant="button" color="text" fontWeight="light">
-            {description}
+            {description || "Description..."}
           </MDTypography>
         </MDBox>
         <MDBox opacity={0.3}>
@@ -111,7 +125,7 @@ function ProfileInfoCard({ title, description, info, social, action, shadow }) {
             <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
               social: &nbsp;
             </MDTypography>
-            {renderSocial}
+            <div className="dnd-wrapper">{renderSocial}</div>
           </MDBox>
         </MDBox>
       </MDBox>

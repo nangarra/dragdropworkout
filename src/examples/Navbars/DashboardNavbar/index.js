@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, Link, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 import AppBar from "@mui/material/AppBar";
@@ -9,7 +9,6 @@ import Menu from "@mui/material/Menu";
 import Icon from "@mui/material/Icon";
 
 import MDBox from "components/MDBox";
-import MDInput from "components/MDInput";
 
 import Breadcrumbs from "examples/Breadcrumbs";
 import NotificationItem from "examples/Items/NotificationItem";
@@ -28,17 +27,18 @@ import {
   setMiniSidenav,
   setOpenConfigurator,
 } from "context";
-import { Button, Card, Divider } from "@mui/material";
+import { Divider } from "@mui/material";
 import { TOKEN } from "constants";
 import { userSignOut } from "services/auth";
-import MDButton from "components/MDButton";
-import { LOGGED_IN_USER } from "constants";
+import MDAvatar from "components/MDAvatar";
+import { setLoggedInUser } from "context";
+import { NO_PROFILE_PIC } from "constants";
 
-function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
-  const loggedInUser = JSON.parse(localStorage.getItem(LOGGED_IN_USER));
+function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
+  const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode, loggedInUser } =
+    controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
   const navigate = useNavigate();
@@ -53,7 +53,11 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
 
     // A function that sets the transparent state of the navbar.
     function handleTransparentNavbar() {
-      setTransparentNavbar(dispatch, (fixedNavbar && window.scrollY === 0) || !fixedNavbar);
+      setTransparentNavbar(
+        dispatch,
+        (fixedNavbar && window.scrollY === 0) || !fixedNavbar,
+        controller
+      );
     }
 
     /** 
@@ -69,16 +73,22 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
     return () => window.removeEventListener("scroll", handleTransparentNavbar);
   }, [dispatch, fixedNavbar]);
 
-  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav);
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
+  const handleMiniSidenav = () => setMiniSidenav(dispatch, !miniSidenav, controller);
+  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator, controller);
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
+
+  const mainRoute = loggedInUser?.SuperUser ? "admin" : "personal-trainer";
 
   const handleSignout = async () => {
     await userSignOut();
     localStorage.removeItem(TOKEN);
-    localStorage.removeItem(LOGGED_IN_USER);
-    navigate("/admin/sign-in");
+    setLoggedInUser(dispatch, {}, controller);
+    navigate(`/sign-in`);
+  };
+
+  const handleProfileClick = () => {
+    navigate(`/${mainRoute}/profile`);
   };
 
   // Render the notifications menu
@@ -92,10 +102,14 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
       }}
       open={Boolean(openMenu)}
       onClose={handleCloseMenu}
-      sx={{ mt: 2 }}
     >
       <NotificationItem icon={<Icon>person</Icon>} title={loggedInUser?.username} />
       <NotificationItem icon={<Icon>email</Icon>} title={loggedInUser?.email} />
+      <NotificationItem
+        icon={<Icon>account_circle</Icon>}
+        title="Profile"
+        onClick={handleProfileClick}
+      />
       <Divider />
       <NotificationItem icon={<Icon>logout</Icon>} title="Sign out" onClick={handleSignout} />
     </Menu>
@@ -114,19 +128,16 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
     },
   });
 
-  const handleAddNew = (e) => {
-    if (onAddNew) {
-      onAddNew(e);
-    }
-  };
-
   return (
     <AppBar
       position={absolute ? "absolute" : navbarType}
       color="inherit"
       sx={(theme) => navbar(theme, { transparentNavbar, absolute, light, darkMode })}
+      style={{
+        borderRadius: 0,
+      }}
     >
-      <Card>
+      <div className="bg-white dark:bg-gray-700">
         <Toolbar sx={(theme) => navbarContainer(theme)}>
           <MDBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
             <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
@@ -134,11 +145,20 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
           {isMini ? null : (
             <MDBox sx={(theme) => navbarRow(theme, { isMini })}>
               <MDBox color={light ? "white" : "inherit"}>
-                {!!onAddNew && (
-                  <MDButton size="small" variant="outlined" color="primary" onClick={handleAddNew}>
-                    <Icon>add</Icon>&nbsp;Add New
-                  </MDButton>
-                )}
+                <NavLink
+                  to={`/${mainRoute}/workouts`}
+                  className={`text-[#7560C5] font-bold transition duration-300 ease-in-out uppercase text-sm mr-8`}
+                >
+                  workspace
+                </NavLink>
+
+                <NavLink
+                  to="/workout-builder"
+                  className={`text-[#7560C5] font-normal transition duration-300 ease-in-out uppercase text-sm mr-8`}
+                >
+                  workout builder
+                </NavLink>
+
                 <IconButton
                   size="medium"
                   disableRipple
@@ -150,6 +170,7 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
                     {miniSidenav ? "menu_open" : "menu"}
                   </Icon>
                 </IconButton>
+
                 <IconButton
                   size="medium"
                   disableRipple
@@ -166,14 +187,20 @@ function DashboardNavbar({ absolute, light, isMini, onAddNew }) {
                   disableRipple
                   onClick={handleOpenMenu}
                 >
-                  <Icon sx={iconsStyle}>account_circle</Icon>
+                  <MDAvatar
+                    src={loggedInUser?.profilePic || NO_PROFILE_PIC}
+                    alt="profile-image"
+                    size="xs"
+                    shadow="xs"
+                  />
+                  {/* <Icon sx={iconsStyle}>account_circle</Icon> */}
                 </IconButton>
                 {renderMenu()}
               </MDBox>
             </MDBox>
           )}
         </Toolbar>
-      </Card>
+      </div>
     </AppBar>
   );
 }
