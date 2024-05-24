@@ -77,13 +77,15 @@ const Home = () => {
 
       <div className="px-4 md:px-0 container mx-auto text-black" style={{ marginTop: 100 }}>
         <div className="grid lg:grid-cols-2 gap-8 justify-center">
-          <motion.img
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.7 }}
-            src="/img/drag_drop_tool.gif"
-            className="rounded-lg shadow-lg"
-          />
+          <div className="flex justify-center w-full">
+            <motion.img
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              src="/img/drag_drop_tool.gif"
+              className="rounded-lg shadow-lg"
+            />
+          </div>
           <motion.div
             initial={{ opacity: 0, x: 100 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -119,13 +121,15 @@ const Home = () => {
             </p>
           </motion.div>
 
-          <motion.img
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.7 }}
-            src="/img/animation_.gif"
-            className="rounded-lg shadow-lg"
-          />
+          <div className="flex justify-center w-full">
+            <motion.img
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, duration: 0.7 }}
+              src="/img/animation_.gif"
+              className="rounded-lg shadow-lg"
+            />
+          </div>
         </div>
       </div>
 
