@@ -40,7 +40,7 @@ MDButton.defaultProps = {
 
 // Typechecking props for the MDButton
 MDButton.propTypes = {
-  size: PropTypes.oneOf(["small", "medium", "large"]),
+  size: PropTypes.oneOf(["small", "medium", "large", "x-large"]),
   variant: PropTypes.oneOf(["text", "contained", "outlined", "gradient"]),
   color: PropTypes.oneOf([
     "white",

@@ -92,7 +92,7 @@ const WorkoutList = () => {
   const columns = useMemo(() => cols, columnHeaders);
 
   return (
-    <div className="container flex flex-col gap-4 py-4">
+    <div className="container flex flex-col gap-4 py-4 mt-6">
       <Card>
         <MDBox
           mx={2}

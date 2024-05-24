@@ -4,11 +4,11 @@ import PageLayout from "examples/LayoutContainers/PageLayout";
 import Header from "examples/Header";
 import PublicFooter from "examples/PublicFooter";
 
-function BasicLayout({ image, children }) {
+function BasicLayout({ image, children, styles = true }) {
   return (
     <PageLayout>
       <Header />
-      <div className="flex flex-col gap-4" style={{ marginTop: 100, marginBottom: 20 }}>
+      <div className="flex flex-col gap-4" style={{ marginTop: 70, marginBottom: styles ? 20 : 0 }}>
         <Grid container justifyContent="center" alignItems="center" height="100%">
           {children}
         </Grid>
@@ -21,6 +21,7 @@ function BasicLayout({ image, children }) {
 // Typechecking props for the BasicLayout
 BasicLayout.propTypes = {
   children: PropTypes.node.isRequired,
+  styles: PropTypes.bool,
 };
 
 export default BasicLayout;

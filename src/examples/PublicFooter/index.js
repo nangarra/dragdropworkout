@@ -15,7 +15,7 @@ function PublicFooter({ company, links, className }) {
       variant="gradient"
       bgColor="primary"
       coloredShadow="primary"
-      className={location.pathname === "/" ? "fixed bottom-0" : ""}
+      // className={location.pathname === "/" ? "fixed bottom-0" : ""}
     >
       <div className="flex items-center justify-between container mx-auto h-[200px]">
         <MDBox

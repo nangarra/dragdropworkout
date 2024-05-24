@@ -483,7 +483,7 @@ const WorkoutBuilder = () => {
       )}
 
       <EditForm open={showEditModal} onClose={handleClose} data={editData} onSubmit={handleEdit} />
-      <div className="container mx-auto">
+      <div className="container mx-auto mt-4">
         <Grid container spacing={2}>
           <DragDropContext onDragEnd={onDragEnd} onDragUpdate={onDragUpdate}>
             {/* --------------- Selected Exercises & Nutritions */}
