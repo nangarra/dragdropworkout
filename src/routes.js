@@ -129,6 +129,14 @@ const publicRoutes = [
   },
   {
     type: "collapse",
+    name: "Sign Up",
+    key: "register",
+    icon: <Icon fontSize="small">login</Icon>,
+    route: "/register",
+    component: lazy(() => import("layouts/authentication/sign-up/index.js")),
+  },
+  {
+    type: "collapse",
     name: "Workouts",
     key: "workouts",
     icon: <Icon fontSize="small">login</Icon>,

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // react-router-dom components
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 // @mui material components
 import Card from "@mui/material/Card";
@@ -140,6 +140,15 @@ function Basic() {
               >
                 {loading && <CircularProgress size={10} color="white" />}&nbsp;sign in
               </MDButton>
+            </MDBox>
+
+            <MDBox my={2}>
+              <div className="flex w-full justify-between items-center text-xs">
+                <span>Don't have an account</span>
+                <NavLink to={"/register"} className="text-[#7560C5] cursor-pointer">
+                  Register Now
+                </NavLink>
+              </div>
             </MDBox>
           </form>
         </MDBox>

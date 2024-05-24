@@ -1,7 +1,7 @@
 import { Skeleton } from "@mui/material";
 
 const Loader = () => (
-  <div className="flex flex-col gap-8 p-2">
+  <div className="flex flex-col gap-8 p-2 mt-4">
     <div className="flex flex-col gap-2">
       <div className="flex w-full justify-between">
         <Skeleton variant="rectangular" className="rounded-md w-[300px]" height={30} />

@@ -90,7 +90,7 @@ const CreatedWorkouts = () => {
   return (
     <BasicLayout>
       <Loading loading={loading} customLoader={<Loader />}>
-        <div className="flex flex-col gap-8 p-2">
+        <div className="flex flex-col gap-8 p-2 mt-4">
           <div className="flex flex-col gap-4">
             {workout?.User && (
               <Paper className="flex justify-between items-center w-full p-4">

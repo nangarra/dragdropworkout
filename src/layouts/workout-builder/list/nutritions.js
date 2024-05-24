@@ -66,10 +66,12 @@ const NutritionsList = (props) => {
                           onMouseEnter={() => setHover(row.id)}
                           onMouseLeave={() => setHover(null)}
                         >
-                          <div className="flex justify-center h-[160px] border-b border-gray-300">
+                          <div className="flex justify-center items-center h-[150px] overflow-hidden border-b border-gray-300">
                             <img
                               src={row.thumbnail || "/img/no-image.png"}
-                              className={`w-1/2 object-cover ${row.thumbnail ? "" : "opacity-50"}`}
+                              className={`w-1/2 h-fit object-cover ${
+                                row.thumbnail ? "" : "opacity-50"
+                              }`}
                             />
                           </div>
                           <div className="py-2 px-4">
@@ -137,10 +139,12 @@ const NutritionsList = (props) => {
                           onMouseEnter={() => setHover(row.id)}
                           onMouseLeave={() => setHover(null)}
                         >
-                          <div className="flex justify-center h-[160px] border-b border-gray-300">
+                          <div className="flex justify-center items-center h-[150px] overflow-hidden border-b border-gray-300">
                             <img
                               src={row.thumbnail || "/img/no-image.png"}
-                              className={`w-1/2 object-cover ${row.thumbnail ? "" : "opacity-50"}`}
+                              className={`w-1/2 h-fit object-cover ${
+                                row.thumbnail ? "" : "opacity-50"
+                              }`}
                             />
                           </div>
                           <div className="py-2 px-4">
