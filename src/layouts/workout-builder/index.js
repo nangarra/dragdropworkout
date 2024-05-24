@@ -83,14 +83,14 @@ const WorkoutBuilder = () => {
   const [search, setSearch] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [noData, setNoData] = useState(false);
-  const [maxHeight, setMaxHeight] = useState(795);
+  const [maxHeight, setMaxHeight] = useState(780);
 
   const [register, setRegister] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
-      setMaxHeight(795 - window.scrollY);
+      setMaxHeight(780 - window.scrollY);
     };
 
     window.addEventListener("scroll", handleScroll);
